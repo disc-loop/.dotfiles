@@ -1,28 +1,34 @@
-" Vundle
 set nocompatible
-filetype off
-set rtp+=~/.vim/bundle/Vundle.vim
 
-call vundle#begin()
+" FZF
+set rtp+=/usr/local/opt/fzf
 
-Plugin 'VundleVim/Vundle.vim'
-Plugin 'preservim/nerdtree'
-Plugin 'dense-analysis/ale'
-Plugin 'powerline/powerline-fonts'
-Plugin 'vim-airline/vim-airline'
-Plugin 'arcticicestudio/nord-vim'
-Plugin 'mileszs/ack.vim'
-Plugin 'fatih/vim-go'
+" vim-plug
+call plug#begin('~/.vim/plugged')
 
-call vundle#end()
+Plug 'junegunn/fzf.vim'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'powerline/powerline-fonts'
+Plug 'vim-airline/vim-airline'
+Plug 'lifepillar/vim-gruvbox8'
+Plug 'preservim/nerdtree'
+Plug 'dense-analysis/ale'
+Plug 'fatih/vim-go'
+Plug 'pangloss/vim-javascript'
+Plug 'arcticicestudio/nord-vim'
 
+call plug#end()
+
+" Indentation settings
 filetype plugin indent on
+set ts=2 sw=2 expandtab " Sets tab and indentation as spaces
 
 " Basic settings
 set backspace=indent,eol,start
 set ruler
 set number relativenumber
 set incsearch
+set ignorecase
 set cursorline
 set wrapscan
 set autoindent
@@ -35,18 +41,22 @@ set splitbelow
 set splitright
 set mouse=a
 set ttymouse=xterm2
-set ts=4 sw=4 " Sets tab to 4 spaces
+let mapleader=","
 
 " Appearance
-colorscheme nord
-syntax on 
+set background=dark
+colorscheme gruvbox8
+let g:gruvbox_italics=1
+syntax on
 let g:airline_powerline_fonts = 1
-
+let g:airline#extensions#tabline#enabled = 1
 if !exists('g:airline_symbols')
     let g:airline_symbols = {}
 endif
 
-" Unicode symbols
+" Fix this mess
+let g:airline#extensions#tabline#left_sep = ''
+let g:airline#extensions#tabline#left_alt_sep = '|'
 let g:airline_left_sep = '»'
 let g:airline_left_sep = '▶'
 let g:airline_right_sep = '«'
@@ -67,8 +77,6 @@ let g:airline_symbols.paste = '∥'
 let g:airline_symbols.spell = 'Ꞩ'
 let g:airline_symbols.notexists = 'Ɇ'
 let g:airline_symbols.whitespace = 'Ξ'
-
-" Powerline symbols
 let g:airline_left_sep = ''
 let g:airline_left_alt_sep = ''
 let g:airline_right_sep = ''
@@ -80,28 +88,22 @@ let g:airline_symbols.linenr = '  '
 let g:airline_symbols.maxlinenr = ' ☰ '
 let g:airline_symbols.dirty='⚡'
 
-" Keymaps for NERDTree
-nnoremap <leader>n :NERDTreeFocus<CR>
-"nnoremap <C-n> :NERDTree<CR>
+" FZF settings
+nnoremap <silent> <C-f> :Files<CR>
+nnoremap <silent> <Leader>f :Ag<CR>
+nnoremap <silent> <Leader>b :Buffers<CR>
+let s:ag_options = ' --skip-vcs-ignores --smart-case '
+
+" NERDTree settings
 nnoremap <C-n> :NERDTreeToggle<CR>
-nnoremap <C-f> :NERDTreeFind<CR>
-" Other nerdtree settings
 let g:NERDTreeWinSize=45
 
 " Terminal settings
-set termwinsize=12*0
+" Creates terminal in new tab
+nnoremap <silent> <Leader>t :terminal<CR><C-w>T
+set termwinsize=12*0 " Uncomment for small terminal
 
 " ALE settings
 let g:ale_enabled=1
 let g:ale_set_balloons=1
 let g:ale_completion_enabled=1
-"set omnifunc=ale#completion#OmniFunc
-
-" Ack / Ag settings
-if executable('ag')
-    let g:ackprg = 'ag --vimgrep --smart-case'
-    cnoreabbrev ag Ack
-    cnoreabbrev aG Ack
-    cnoreabbrev Ag Ack
-endif
-
