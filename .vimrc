@@ -15,7 +15,6 @@ Plug 'preservim/nerdtree'
 Plug 'dense-analysis/ale'
 Plug 'fatih/vim-go'
 Plug 'pangloss/vim-javascript'
-Plug 'arcticicestudio/nord-vim'
 
 call plug#end()
 
@@ -24,9 +23,13 @@ filetype plugin indent on
 set ts=2 sw=2 expandtab " Sets tab and indentation as spaces
 
 " Basic settings
+let mapleader=","
 set backspace=indent,eol,start
 set ruler
 set number relativenumber
+set hlsearch
+" Clear highlighting
+nnoremap <silent> <Leader>c :nohlsearch<CR>
 set incsearch
 set ignorecase
 set cursorline
@@ -41,7 +44,6 @@ set splitbelow
 set splitright
 set mouse=a
 set ttymouse=xterm2
-let mapleader=","
 
 " Appearance
 set background=dark
@@ -82,28 +84,33 @@ let g:airline_left_alt_sep = ''
 let g:airline_right_sep = ''
 let g:airline_right_alt_sep = ''
 let g:airline_symbols.branch = ''
-let g:airline_symbols.colnr = ''
+let g:airline_symbols.colnr = ':'
 let g:airline_symbols.readonly = ''
 let g:airline_symbols.linenr = '  '
 let g:airline_symbols.maxlinenr = ' ☰ '
 let g:airline_symbols.dirty='⚡'
 
+" ALE settings
+let g:ale_enabled=1
+let g:ale_set_balloons=1
+let g:ale_completion_enabled=1
+
 " FZF settings
-nnoremap <silent> <C-f> :Files<CR>
-nnoremap <silent> <Leader>f :Ag<CR>
+nnoremap <silent> <C-f> :Ag<CR>
+nnoremap <silent> <Leader>f :Files<CR>
 nnoremap <silent> <Leader>b :Buffers<CR>
 let s:ag_options = ' --skip-vcs-ignores --smart-case '
+nnoremap <silent> <Leader>ag :Ag <C-R><C-W><CR>
 
 " NERDTree settings
 nnoremap <C-n> :NERDTreeToggle<CR>
 let g:NERDTreeWinSize=45
 
 " Terminal settings
-" Creates terminal in new tab
-nnoremap <silent> <Leader>t :terminal<CR><C-w>T
-set termwinsize=12*0 " Uncomment for small terminal
+nnoremap <silent> <Leader>T :terminal<CR><C-w>T
+nnoremap <silent> <Leader>t :terminal<CR>
+set termwinsize=12*0 " Smaller terminal
 
-" ALE settings
-let g:ale_enabled=1
-let g:ale_set_balloons=1
-let g:ale_completion_enabled=1
+" vim-go Debugger settings
+" Starts the debugger regularly and for test files
+" nnoremap <Leader>d :GoDebug
