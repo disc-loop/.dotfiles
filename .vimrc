@@ -8,6 +8,8 @@ call plug#begin('~/.vim/plugged')
 
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/limelight.vim'
+Plug 'junegunn/goyo.vim'
 Plug 'powerline/powerline-fonts'
 Plug 'vim-airline/vim-airline'
 Plug 'lifepillar/vim-gruvbox8'
@@ -77,7 +79,12 @@ let g:airline_symbols.maxlinenr = ' '
 let g:airline_symbols.dirty='⚡'
 
 " Clear search highlighting
-nnoremap <silent> <Leader>c :nohlsearch<CR>
+nnoremap <silent><Leader>c :nohlsearch<CR>
+
+" Terminal settings
+nnoremap <silent><Leader>T :terminal<CR><C-w>T
+nnoremap <silent><Leader>t :terminal<CR>
+set termwinsize=12*0 " Smaller terminal
 
 " ALE settings
 let g:ale_enabled=1
@@ -85,21 +92,27 @@ let g:ale_set_balloons=1
 let g:ale_completion_enabled=1
 
 " FZF settings
-nnoremap <silent> <C-f> :Ag<CR>
-nnoremap <silent> <Leader>f :Files<CR>
-nnoremap <silent> <Leader>b :Buffers<CR>
+nnoremap <silent><C-f> :Ag<CR>
+nnoremap <silent><Leader>f :Files<CR>
+nnoremap <silent><Leader>b :Buffers<CR>
 let s:ag_options = ' --skip-vcs-ignores --smart-case '
-nnoremap <silent> <Leader>ag :Ag <C-R><C-W><CR>
+nnoremap <silent><Leader>ag :Ag <C-R><C-W><CR>
 
 " NERDTree settings
-nnoremap <C-n> :NERDTreeToggle<CR>
 let g:NERDTreeWinSize=45
+nnoremap <silent><Leader><Tab> :NERDTreeToggle<CR>
 
-" Terminal settings
-nnoremap <silent> <Leader>T :terminal<CR><C-w>T
-nnoremap <silent> <Leader>t :terminal<CR>
-set termwinsize=12*0 " Smaller terminal
+" Goyo settings
+let g:goyo_width=120
+let g:goyo_linenr=1
+nnoremap <silent><Leader>g :Goyo<CR>
+nnoremap <silent><Leader>gl :Limelight!!<CR> :Goyo<CR>
+
+" Limelight settings
+let g:limelight_conceal_ctermfg = 'darkgrey'
+nnoremap <silent><Leader>l :Limelight!!<CR>
 
 " vim-go Debugger settings
+" Fix the linting marks so that they play nicely with ale
 " Starts the debugger regularly and for test files
 " nnoremap <Leader>d :GoDebug
