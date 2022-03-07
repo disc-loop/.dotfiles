@@ -12,11 +12,14 @@ Plug 'junegunn/limelight.vim'
 Plug 'junegunn/goyo.vim'
 Plug 'powerline/powerline-fonts'
 Plug 'vim-airline/vim-airline'
+Plug 'kaicataldo/material.vim'
+Plug 'arcticicestudio/nord-vim'
 Plug 'lifepillar/vim-gruvbox8'
 Plug 'preservim/nerdtree'
 Plug 'dense-analysis/ale'
 Plug 'fatih/vim-go'
 Plug 'pangloss/vim-javascript'
+Plug 'tpope/vim-fugitive'
 
 call plug#end()
 
@@ -45,40 +48,25 @@ set splitbelow
 set splitright
 set mouse=a
 set ttymouse=xterm2
-set timeoutlen=1000 ttimeoutlen=0
+set timeoutlen=1000 ttimeoutlen=0 " First is for waiting for keybinds, second is for faster escape
+set updatetime=750 " For fast CursorHold event, which I use for ALEHover
+set nowrap
 
 " Appearance
+set fillchars+=vert:\
 set background=dark
 colorscheme gruvbox8
 let g:gruvbox_italics=1
 syntax on
-let g:airline_powerline_fonts = 1
-let g:airline#extensions#tabline#enabled = 1
-if !exists('g:airline_symbols')
-    let g:airline_symbols = {}
-endif
+let g:airline_powerline_fonts=1
+let g:airline#extensions#tabline#enabled=1
 
-" Fix this mess
-let g:airline#extensions#tabline#left_sep = ''
-let g:airline#extensions#tabline#left_alt_sep = '|'
-let g:airline_symbols.crypt = '🔒'
-let g:airline_symbols.linenr = '☰'
-let g:airline_symbols.branch = '⎇'
-let g:airline_symbols.paste = 'ρ'
-let g:airline_symbols.notexists = 'Ɇ'
-let g:airline_symbols.whitespace = 'Ξ'
-let g:airline_left_sep = ''
-let g:airline_left_alt_sep = ''
-let g:airline_right_sep = ''
-let g:airline_right_alt_sep = ''
-let g:airline_symbols.branch = ''
-let g:airline_symbols.colnr = ''
-let g:airline_symbols.readonly = ''
-let g:airline_symbols.linenr = '  '
-let g:airline_symbols.maxlinenr = ' '
-let g:airline_symbols.dirty='⚡'
+" Vimdiff settings
+" if &diff
+"     highlight! link DiffText MatchParen
+" endif
 
-" Clear search highlighting
+" Highlight settings
 nnoremap <silent><Leader>c :nohlsearch<CR>
 
 " Terminal settings
@@ -90,6 +78,8 @@ set termwinsize=12*0 " Smaller terminal
 let g:ale_enabled=1
 let g:ale_set_balloons=1
 let g:ale_completion_enabled=1
+let g:airline#extensions#ale#enabled=1
+let g:ale_lsp_show_message_severity='error'
 
 " FZF settings
 nnoremap <silent><C-f> :Ag<CR>
@@ -103,14 +93,18 @@ let g:NERDTreeWinSize=45
 nnoremap <silent><Leader><Tab> :NERDTreeToggle<CR>
 
 " Goyo settings
+highlight StatusLineNC ctermfg=none
 let g:goyo_width=120
 let g:goyo_linenr=1
-nnoremap <silent><Leader>g :Goyo<CR>
-nnoremap <silent><Leader>gl :Limelight!!<CR> :Goyo<CR>
+nnoremap <silent><Leader>g :Goyo<bar> highlight StatusLineNC ctermfg=none <CR>
+nnoremap <silent><Leader>gl :Limelight!!<CR> :Goyo<bar> highlight StatusLineNC ctermfg=none <CR>
 
 " Limelight settings
-let g:limelight_conceal_ctermfg = 'darkgrey'
+let g:limelight_conceal_ctermfg=8
 nnoremap <silent><Leader>l :Limelight!!<CR>
+
+" Git Fugitive settings
+set statusline=%<%f\ %h%m%r%{FugitiveStatusline()}%=%-14.(%l,%c%V%)\ %P
 
 " vim-go Debugger settings
 " Fix the linting marks so that they play nicely with ale
