@@ -53,18 +53,30 @@ set updatetime=750 " For fast CursorHold event, which I use for ALEHover
 set nowrap
 
 " Appearance
-set fillchars+=vert:\
+set fillchars+=vert:\ 
 set background=dark
 colorscheme gruvbox8
 let g:gruvbox_italics=1
 syntax on
 let g:airline_powerline_fonts=1
 let g:airline#extensions#tabline#enabled=1
+highlight StatusLineNC ctermfg=none
+" Should make tilde disappear, but doesn't
+hi! EndOfBuffer ctermbg=bg ctermfg=bg guibg=bg guifg=bg 
 
 " Vimdiff settings
 " if &diff
 "     highlight! link DiffText MatchParen
 " endif
+
+" Tab settings
+nnoremap <silent><C-w>t :tabnew<CR>
+
+" Buffer settings
+nnoremap <silent><Leader>r :e<CR>
+nnoremap <silent><Leader>R :bufdo e!<CR><C-w>:b#<CR>:e<CR> 
+" Fix so this doesn't swap back to prev buffer when there's no term.
+" Use a func to do so
 
 " Highlight settings
 nnoremap <silent><Leader>c :nohlsearch<CR>
@@ -81,19 +93,21 @@ let g:ale_completion_enabled=1
 let g:airline#extensions#ale#enabled=1
 let g:ale_lsp_show_message_severity='error'
 
+" Search settings
+nnoremap <Leader>F :vimgrep 
+
 " FZF settings
-nnoremap <silent><C-f> :Ag<CR>
-nnoremap <silent><Leader>f :Files<CR>
+nnoremap <silent><Leader>f :Ag<CR>
+nnoremap <silent><Leader>o :Files<CR>
 nnoremap <silent><Leader>b :Buffers<CR>
 let s:ag_options = ' --skip-vcs-ignores --smart-case '
 nnoremap <silent><Leader>ag :Ag <C-R><C-W><CR>
 
 " NERDTree settings
 let g:NERDTreeWinSize=45
-nnoremap <silent><Leader><Tab> :NERDTreeToggle<CR>
+nnoremap <silent><Leader><Tab> :NERDTreeToggle<CR> :NERDTreeRefreshRoot<CR>
 
 " Goyo settings
-highlight StatusLineNC ctermfg=none
 let g:goyo_width=120
 let g:goyo_linenr=1
 nnoremap <silent><Leader>g :Goyo<bar> highlight StatusLineNC ctermfg=none <CR>
