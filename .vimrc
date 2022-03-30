@@ -53,7 +53,7 @@ set updatetime=750 " For fast CursorHold event, which I use for ALEHover
 set nowrap
 
 " Appearance
-set fillchars+=vert:\ 
+" Use :hi Normal<CR> and :hi StatusLine<CR> for finding colours
 set background=dark
 colorscheme gruvbox8
 let g:gruvbox_italics=1
@@ -61,8 +61,12 @@ syntax on
 let g:airline_powerline_fonts=1
 let g:airline#extensions#tabline#enabled=1
 highlight StatusLineNC ctermfg=none
+hi CursorLine ctermfg=none ctermbg=236
+set fillchars+=vert:\█
+hi VertSplit ctermfg=237
+hi SignColumn ctermbg=none
 " Should make tilde disappear, but doesn't
-hi! EndOfBuffer ctermbg=bg ctermfg=bg guibg=bg guifg=bg 
+hi EndOfBuffer ctermfg=bg
 
 " Vimdiff settings
 " if &diff
@@ -110,12 +114,12 @@ nnoremap <silent><Leader><Tab> :NERDTreeToggle<CR> :NERDTreeRefreshRoot<CR>
 " Goyo settings
 let g:goyo_width=120
 let g:goyo_linenr=1
-nnoremap <silent><Leader>g :Goyo<bar> highlight StatusLineNC ctermfg=none <CR>
-nnoremap <silent><Leader>gl :Limelight!!<CR> :Goyo<bar> highlight StatusLineNC ctermfg=none <CR>
+" Jankiest solution to Goyo ignoring highlight groups by sourcing .vimrc
+nnoremap <silent><Leader>l :Goyo<bar>hi StatusLineNC ctermfg=none<CR>:set wrap!<CR>:so ~/.vimrc<CR>
 
 " Limelight settings
 let g:limelight_conceal_ctermfg=8
-nnoremap <silent><Leader>l :Limelight!!<CR>
+nnoremap <silent><Leader>L :Limelight!!<CR>
 
 " Git Fugitive settings
 set statusline=%<%f\ %h%m%r%{FugitiveStatusline()}%=%-14.(%l,%c%V%)\ %P
