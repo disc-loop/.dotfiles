@@ -1,6 +1,4 @@
-set nocompatible
-
-" FZF
+" FZF runtime path
 set rtp+=/usr/local/opt/fzf
 
 " vim-plug
@@ -69,11 +67,6 @@ hi SignColumn ctermbg=none
 " Should make tilde disappear, but doesn't
 hi EndOfBuffer ctermfg=bg
 
-" Vimdiff
-" if &diff
-"     highlight! link DiffText MatchParen
-" endif
-
 " Tab
 nnoremap <silent><C-w>t :tabnew<CR>
 
@@ -82,6 +75,9 @@ nnoremap <silent><Leader>r :e<CR>
 nnoremap <silent><Leader>R :bufdo e!<CR><C-w>:b#<CR>:e<CR> 
 " Fix so this doesn't swap back to prev buffer when there's no term.
 " Use a func to do so
+
+" Search
+nnoremap <Leader>F :vimgrep 
 
 " Highlight
 nnoremap <silent><Leader>c :nohlsearch<CR>
@@ -97,9 +93,8 @@ let g:ale_set_balloons=1
 let g:ale_completion_enabled=1
 let g:airline#extensions#ale#enabled=1
 let g:ale_lsp_show_message_severity='error'
-
-" Search
-nnoremap <Leader>F :vimgrep 
+let g:ale_linters = { 'javascript': ['prettier', 'eslint'] }
+let g:ale_fixers = { 'javascript': ['prettier', 'eslint'] }
 
 " FZF
 nnoremap <silent><Leader>f :Ag<CR>
@@ -114,11 +109,15 @@ let g:NERDTreeShowHidden=1
 let g:NERDTreeChDirMode=3
 nnoremap <silent><Leader><Tab> :NERDTreeToggle<CR> :NERDTreeRefreshRoot<CR>
 
+" Wrap
+nnoremap <silent><Leader>w :set wrap!<CR>
+
 " Goyo
 let g:goyo_width=120
 let g:goyo_linenr=1
-" Jankiest solution to Goyo ignoring highlight groups by sourcing .vimrc
-nnoremap <silent><Leader>l :Goyo<bar>hi StatusLineNC ctermfg=none<CR>:set wrap!<CR>:so ~/.vimrc<CR>
+" Jankiest solution to Goyo ignoring highlight groups by resetting them each
+" time this is called 
+nnoremap <silent><Leader>l :Goyo<bar>hi StatusLineNC ctermfg=none<CR>:hi VertSplit ctermfg=237<CR>:hi CursorLine ctermfg=none ctermbg=236<CR>:hi SignColumn ctermbg=none<CR>
 
 " Limelight
 let g:limelight_conceal_ctermfg=8
@@ -127,7 +126,6 @@ nnoremap <silent><Leader>L :Limelight!!<CR>
 " Git Fugitive
 set statusline=%<%f\ %h%m%r%{FugitiveStatusline()}%=%-14.(%l,%c%V%)\ %P
 
-" vim-go Debugger
-" Fix the linting marks so that they play nicely with ale
-" Starts the debugger regularly and for test files
-" nnoremap <Leader>d :GoDebug
+" Glow
+" Using quotes around %:p because otherwise it won't open files with spaces in names
+nnoremap <silent><Leader>v :silent !glow -p "%:p"<CR><C-L>
