@@ -4,9 +4,11 @@ export PATH=$PATH:~/bin
 
 # If you come from bash you might have to change your $PATH.
 
-# Golang exports
-export GOPATH=$HOME/go
-export PATH=$PATH:$GOPATH/bin 
+# Jenv
+export PATH="$HOME/.jenv/bin:$PATH"
+eval "$(jenv init -)"
+
+# Golang exports export GOPATH=$HOME/go export PATH=$PATH:$GOPATH/bin 
 export PATH=$PATH:$GOPATH/bin:/usr/local/go/bin
 export GOPRIVATE=scm.applatform.io
 
@@ -18,6 +20,9 @@ ZSH_THEME="agnostom"
 
 # Racket
 export PATH="/Applications/Racket/bin:$PATH"
+
+# Coursier
+export PATH="$PATH:/Users/thomasjones/Library/Application Support/Coursier/bin"
 
 # Plugins
 plugins=(git)
@@ -35,16 +40,13 @@ eval "$(saml2aws --completion-script-zsh)"
 # export PATH="/usr/local/opt/mysql-client/bin:$PATH"
 
 source $ZSH/oh-my-zsh.sh
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # Keep these things below sourcing of ohmyzsh
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh;
-export FZF_DEFAULT_COMMAND="fd --type f"
+# export FZF_DEFAULT_COMMAND="fd --type f"
+export FZF_DEFAULT_COMMAND="ag --hidden --ignore .git -g ''"
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS="--preview-window 'up,60%,border-bottom,+{2}+3/3,~3'"
 
-# Aliases
-alias kb="~/kanban.sh"
-alias zshconf="vim ~/.zshrc"
-alias ohmyzsh="vim ~/.oh-my-zsh"
-alias nonprod="app-aws-login.py nonprod"
-
+[ -f "/Users/thomasjones/.ghcup/env" ] && source "/Users/thomasjones/.ghcup/env" # ghcup-env

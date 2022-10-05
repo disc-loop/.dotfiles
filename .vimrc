@@ -1,38 +1,35 @@
 " FZF runtime path
 set rtp+=/usr/local/opt/fzf
 
-" vim-plug
+" ======== Plugins
 call plug#begin('~/.vim/plugged')
 
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/limelight.vim'
 Plug 'junegunn/goyo.vim'
 Plug 'powerline/powerline-fonts'
 Plug 'vim-airline/vim-airline'
 Plug 'lifepillar/vim-gruvbox8'
+Plug 'dracula/vim', { 'as': 'dracula' }
 Plug 'preservim/nerdtree'
-Plug 'dense-analysis/ale'
 Plug 'fatih/vim-go'
+Plug 'editorconfig/editorconfig-vim'
+Plug 'dense-analysis/ale'
 Plug 'pangloss/vim-javascript'
+Plug 'leafgarland/typescript-vim'
 
 call plug#end()
 
-" Indentation
-filetype plugin indent on
+" ======== Basic
+filetype plugin indent on " Indentation
 set ts=2 sw=2 expandtab " Sets tab and indentation as spaces
-
-" Basic
 set backspace=indent,eol,start
-set ruler
+set cursorline ruler
 set number relativenumber
-set hlsearch
-set incsearch
+set hlsearch incsearch
 set ignorecase
-set cursorline
 set wrapscan
-set autoindent
-set smartindent
+set autoindent smartindent
 set hidden
 set showmode
 set showcmd
@@ -45,70 +42,96 @@ set ttymouse=xterm2
 set timeoutlen=1000 ttimeoutlen=0 " First is for waiting for keybinds, second is for faster escape
 set updatetime=750 " For fast CursorHold event, which I use for ALEHover
 set nowrap
+set wildignore+=node_modules/**,.git/** " These get ignored in file searching
+set re=0 " Use new regular expression engine so vim doesn't lag with typescript files 
+set listchars=eol:¬,tab:>>,trail:~,space:_ " Show hidden characters
 
-" Hotkeys
+" ======== Hotkeys
 let mapleader=","
 
-" Tab
-nnoremap <silent><C-w>t :tabnew<CR>
+" Overrides command line behaviour to allow cursor to move to beginning of line
+cnoremap <C-a> <Home>
 
-" Buffer
-nnoremap <silent><Leader>r :e<CR>
-nnoremap <silent><Leader>R :bufdo e!<CR><C-w>:b#<CR>:e<CR> 
-" Fix so this doesn't swap back to prev buffer when there's no term.
-" Use a func to do so
+" Wrap
+nnoremap <silent><Leader>w :set wrap!<CR>
 
-" Search
-" The trailing whitespace is necessary
-nnoremap <Leader>F :vimgrep 
+" Quickfix
+nnoremap <silent><C-q> :copen<CR>
+nnoremap <silent><C-n> :cn<CR>
+nnoremap <silent><C-p> :cp<CR>
 
-" Highlight
+" Search cursor word
+" The trailing whitespace is necessary.
+" This can be improved with a custom command that performs 'copen'
+" at the end.
+nnoremap <Leader>F :vimgrep /<C-r><C-w>/ ./*
+
+" Clear current highlight
 nnoremap <silent><Leader>c :nohlsearch<CR>
 
-" Terminal
+" Open terminal
 nnoremap <silent><Leader>T :terminal<CR><C-w>T
 nnoremap <silent><Leader>t :terminal<CR>
-set termwinsize=12*0
+set termwinsize=17*0
+
+" Refresh buffers (WIP)
+" Fix so this doesn't swap back to prev buffer when there's no term.
+" Use a func to do so
+nnoremap <silent><Leader>R :bufdo e!<CR><C-w>:b#<CR>:e<CR> 
 
 " ALE
-let g:ale_enabled=1
+" Remember to properly install the linters / fixers first
+" e.g. I needed to do `npm init @eslint/config` before it worked
+let g:ale_linters = {
+  \ 'scala': ['metals'],
+  \ 'go': ['gopls', 'golangcli-lint'],
+  \} 
+let g:ale_fixers = { 
+  \ 'javascript': ['eslint', 'prettier'],
+  \ 'typescript': ['eslint', 'prettier'],
+  \ 'scala': ['scalafmt'],
+  \}
+let g:ale_fix_on_save=1
 let g:ale_set_balloons=1
 let g:ale_completion_enabled=1
 let g:airline#extensions#ale#enabled=1
-let g:ale_lsp_show_message_severity='error'
-let g:ale_linters = { 'javascript': ['prettier', 'eslint'] }
-let g:ale_fixers = { 'javascript': ['prettier', 'eslint'] }
+nnoremap <silent><Leader>gd :ALEGoToDefinition<CR>
+nnoremap <silent><Leader>d :ALEDetail<CR>
+nnoremap <silent><Leader>an :ALENext<CR>
+nnoremap <silent><Leader>ab :ALEPrevious<CR>
+nnoremap <silent><Leader>af :ALEFindReferences<CR>
 
 " FZF
-let s:ag_options = ' --skip-vcs-ignores --smart-case '
 nnoremap <silent><Leader>f :Ag<CR>
 nnoremap <silent><Leader>o :Files<CR>
 nnoremap <silent><Leader>b :Buffers<CR>
 nnoremap <silent><Leader>ag :Ag <C-R><C-W><CR>
+" Don't think this does anything. FZF Ag doesn't support options, 
+" so you will need to overwrite the function.
+" let s:ag_options = ' --smart-case --hidden'
 
 " NERDTree
 let g:NERDTreeWinSize=45
 let g:NERDTreeShowHidden=1
 let g:NERDTreeChDirMode=3
+" Not sure why the first pattern works. Come back to understand this.
+let NERDTreeIgnore=['\.*\.sw.$', '\~$']
 nnoremap <silent><Leader><Tab> :NERDTreeToggle<CR> :NERDTreeRefreshRoot<CR>
-
-" Wrap
-nnoremap <silent><Leader>w :set wrap!<CR>
 
 " Goyo
 let g:goyo_width=120
 let g:goyo_linenr=1
-nnoremap <silent><Leader>l :Goyo <bar>call SetAppearance()<CR>
-
-" Limelight
-let g:limelight_conceal_ctermfg=235
-nnoremap <silent><Leader>L :Limelight!!<CR>
+nnoremap <silent><Leader>m :Goyo <bar>call SetAppearance()<CR>
 
 " Glow
 " Using quotes around %:p because otherwise it won't open files with spaces in names
-nnoremap <silent><Leader>v :silent !glow -p "%:p"<CR><C-L>
+nnoremap <silent><Leader>V :silent !glow -p "%:p"<CR><C-L>
+nnoremap <silent><Leader>v :terminal ++shell ++close glow -p "%:p"<CR>
 
-" Appearance
+" Learn X in Y
+nnoremap <Leader>l :terminal ++shell ++close learn 
+
+" ======== Appearance
 syntax on
 " Use `:hi Normal`, and `:hi StatusLine` for finding colours
 fun SetAppearance()

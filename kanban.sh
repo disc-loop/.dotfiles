@@ -11,14 +11,14 @@ workBoard() {
     else 
       printf '\nCreating board...\n\n'
       if [ -f ~/Documents/Notes/Work/$yest.md ]
-        then cp  ~/Documents/Notes/Work/$yest.md ~/Documents/Notes/Work/$now.md
-        else cp ~/Documents/Notes/Templates/kanban\ template.md ~/Documents/Notes/Work/$now.md 
+        then cp  ~/Documents/Notes/Work/$yest.md ~/Documents/Notes/Work/$now.md && taskell ~/Documents/Notes/Work/$now.md
+        else cp ~/Documents/Notes/Templates/Kanban.md ~/Documents/Notes/Work/$now.md 
       fi
   fi
 }
 
 personalBoard() {
-  taskell ~/Documents/Notes/todo.md
+  taskell ~/Documents/Notes/Tasks/Daily.md
 }
 
 openBoard() {
