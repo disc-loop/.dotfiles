@@ -20,6 +20,7 @@ Plug 'leafgarland/typescript-vim'
 call plug#end()
 
 " ======== General
+set showcmd " Shows the commands being used in the command line
 set number relativenumber cursorline " Sets relative line numbering and shows the line the cursor is on
 set hlsearch incsearch ignorecase wrapscan " Highlight pending searches and search results, ignores case and searches globally
 set nowrap " Do not wrap text in windows by default
@@ -63,10 +64,6 @@ call SetAppearance()
 let mapleader=","
 " Overrides command line behaviour to allow cursor to move to beginning of line
 cmap <C-a> <Home>
-" Quickfix navigation
-nmap <silent><C-q> :copen<CR>
-nmap <silent><C-n> :cn<CR>
-nmap <silent><C-p> :cp<CR>
 " Searches for the word under the cursor in the directory of your choosing
 nmap <Leader>F :vimgrep /<C-r><C-w>/ ./*
 " Clears current highlighting 
@@ -100,7 +97,7 @@ nmap <silent><Leader>gd :ALEGoToDefinition<CR>
 nmap <silent><Leader>d :ALEDetail<CR>
 nmap <silent><Leader>an :ALENext<CR>
 nmap <silent><Leader>ab :ALEPrevious<CR>
-nmap <silent><Leader>af :ALEFindReferences<CR>
+nmap <silent><Leader>af :ALEFindReferences -quickfix<CR>:copen<CR>
 
 " FZF
 nmap <silent><Leader>f :Ag<CR>
