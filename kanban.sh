@@ -6,11 +6,11 @@ set -euo pipefail
 workBoard() {
   now=$(date +%y-%m-%d) 
   yest=$(date -v -1d +%y-%m-%d)
-  if [ -f ~/Documents/Notes/Work/$now.md ]
-    then taskell ~/Documents/Notes/Work/$now.md
+  if [ -f "$HOME/Documents/Notes/Work/$now.md" ]
+    then taskell "$HOME/Documents/Notes/Work/$now.md"
     else 
       printf '\nCreating board...\n\n'
-      if [ -f ~/Documents/Notes/Work/$yest.md ]
+      if [ -f "$HOME/Documents/Notes/Work/$yest.md" ]
         then cp  ~/Documents/Notes/Work/$yest.md ~/Documents/Notes/Work/$now.md && taskell ~/Documents/Notes/Work/$now.md
         else cp ~/Documents/Notes/Templates/Kanban.md ~/Documents/Notes/Work/$now.md 
       fi
