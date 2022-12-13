@@ -28,30 +28,31 @@ set tabstop=2 shiftwidth=2 expandtab " Sets the amount of spaces <Tab> is worth 
 set autoindent smartindent " Enables smart auto-indentation
 filetype plugin indent on " Enables filetype detection, both for plugins and automatic indentation
 set backspace=indent,eol,start " Enables backspacing over auto-indenting, line breaks and the start of the line
+set whichwrap=h,l,b,s,<,> " Specifies particular keys that let the cursor move to the next/prev line at the first/last char
 set splitbelow splitright " New splits are initialised from the bottom right
-set listchars=eol:¬,tab:>>,trail:~,space:_ " Set symbols for hidden characters
+set listchars=trail:~,tab:\|\ , " Set symbols for hidden characters
 set termwinsize=18*0 " Sets the 'terminal' window size
 set mouse=a ttymouse=xterm2 " Enables mouse use
 set timeoutlen=1000 ttimeoutlen=0 " Sets wait time for hotkeys and <esc>
 set updatetime=750 " Sets the duration before the file is written to disk. I'm using this for faster CursorHold events
 set re=0 " Use new regular expression engine so Vim doesn't lag with some filetypes, e.g. .ts
-set wildignore+=node_modules/**,.git/** " Ignore these patterns when file searching 
+set wildignore+=*/node_modules/*,*/.git/* " Ignore these patterns when file searching
 
 " ======== Appearance
-syntax on
+syntax enable
 colorscheme gruvbox8
-let g:gruvbox_italics=1
 let g:airline_powerline_fonts=1
 let g:airline#extensions#tabline#enabled=1
 let &t_EI = "\e[2 q" " Sets the cursor to thin bar in insert mode
-let &t_SI = "\e[6 q" " 
+let &t_SI = "\e[6 q" "
 " This function exists as a workaround due to Goyo not resetting the appearance settings properly after exit
 fun SetAppearance()
   set background=dark
   set fillchars+=vert:\█ " Makes the vertical bar on the left thicc
   " Tip: Use `:hi Normal`, and `:hi StatusLine` for finding the colours of highlight groups
   " This changes the colour of the intersecting square between NERDTree and the statusline
-  hi StatusLineNC ctermfg=237 
+  hi StatusLineNC ctermfg=237
+  hi StatusLine ctermfg=237
   hi VertSplit ctermfg=237
   " WIP: Should make the tilde at the eol disappear, but doesn't
   " hi EndOfBuffer ctermfg=bg 
@@ -64,13 +65,10 @@ call SetAppearance()
 let mapleader=","
 " Overrides command line behaviour to allow cursor to move to beginning of line
 cmap <C-a> <Home>
-" Searches for the word under the cursor in the directory of your choosing
-nmap <Leader>F :vimgrep /<C-r><C-w>/ ./*
 " Clears current highlighting 
 nmap <silent><Leader>c :nohlsearch<CR>
-" Opens a terminal inside Vim either in the current tab or in a new one
+" Opens a terminal inside Vim
 nmap <silent><Leader>t :terminal<CR>
-nmap <silent><Leader>T :terminal<CR><C-w>T
 " Runs an alias I have set for Taskell and a script to manage my Kanban files 
 nmap <silent><Leader>k :terminal ++shell ++close kb<CR>
 " Renders the current buffer in markdown using Glow, either in a new window or in the current shell
@@ -83,6 +81,7 @@ nmap <Leader>l :terminal ++shell ++close learn
 let g:ale_linters = {
   \ 'go': ['gopls', 'golangcli-lint'],
   \ 'scala': ['metals'],
+  \ 'python': ['pylint'],
   \} 
 let g:ale_fixers = { 
   \ 'javascript': ['eslint', 'prettier'],
@@ -114,8 +113,3 @@ let g:NERDTreeShowHidden=1
 let g:NERDTreeChDirMode=3
 let NERDTreeIgnore=['\.*\.sw.$', '\~$']
 nmap <silent><Leader><Tab> :NERDTreeToggle<CR> :NERDTreeRefreshRoot<CR>
-
-" Goyo
-let g:goyo_width=120
-let g:goyo_linenr=1
-nmap <silent><Leader>m :Goyo<bar>call SetAppearance()<CR>
