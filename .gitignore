@@ -1,0 +1,9 @@
+*~
+.*.sw?
+.vscode/
+.metals/
+.bloop/
+.ammonite/
+metals.sbt
+.notes*
+ctags

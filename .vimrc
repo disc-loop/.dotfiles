@@ -6,7 +6,6 @@ call plug#begin('~/.vim/plugged')
 
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/goyo.vim'
 Plug 'powerline/powerline-fonts'
 Plug 'vim-airline/vim-airline'
 Plug 'lifepillar/vim-gruvbox8'
@@ -16,6 +15,8 @@ Plug 'dense-analysis/ale'
 Plug 'fatih/vim-go'
 Plug 'pangloss/vim-javascript'
 Plug 'leafgarland/typescript-vim'
+Plug 'vim-ruby/vim-ruby'
+Plug 'tpope/vim-rails'
 
 call plug#end()
 
@@ -44,7 +45,7 @@ colorscheme gruvbox8
 let g:airline_powerline_fonts=1
 let g:airline#extensions#tabline#enabled=1
 let &t_EI = "\e[2 q" " Sets the cursor to thin bar in insert mode
-let &t_SI = "\e[6 q" "
+let &t_SI = "\e[6 q"
 " This function exists as a workaround due to Goyo not resetting the appearance settings properly after exit
 fun SetAppearance()
   set background=dark
