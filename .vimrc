@@ -8,10 +8,9 @@ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'powerline/powerline-fonts'
 Plug 'vim-airline/vim-airline'
 Plug 'lifepillar/vim-gruvbox8'
-" Plug 'ellisonleao/gruvbox.nvim'
+Plug 'ellisonleao/gruvbox.nvim'
 Plug 'preservim/nerdtree'
 Plug 'editorconfig/editorconfig-vim'
-" Plug 'dense-analysis/ale'
 Plug 'neoclide/coc.nvim', {'branch': 'master', 'do': 'yarn install --frozen-lockfile'}
 Plug 'fatih/vim-go'
 Plug 'pangloss/vim-javascript'
@@ -19,6 +18,7 @@ Plug 'leafgarland/typescript-vim'
 Plug 'vim-ruby/vim-ruby'
 Plug 'tpope/vim-rails'
 Plug 'tpope/vim-commentary'
+Plug 'mattn/emmet-vim'
 
 call plug#end()
 
@@ -26,6 +26,7 @@ call plug#end()
 set showcmd " Shows the commands being used in the command line
 set number relativenumber cursorline " Sets relative line numbering and shows the line the cursor is on
 set hlsearch incsearch ignorecase wrapscan " Highlight pending searches and search results, ignores case and searches globally
+set hidden " Allows you to swap to different buffers without writing to files
 set nowrap " Do not wrap text in windows by default
 set tabstop=2 shiftwidth=2 expandtab " Sets the amount of spaces <Tab> is worth and the number of spaces to use for (auto)indentation in insert mode
 set autoindent smartindent " Enables smart auto-indentation
@@ -49,10 +50,15 @@ if has('nvim')
 else
   colorscheme gruvbox8
 endif
-let g:airline_powerline_fonts=1
-let g:airline#extensions#tabline#enabled=1
 let &t_EI = "\e[2 q" " Sets the cursor to thin bar in insert mode
 let &t_SI = "\e[6 q"
+set fillchars+=vert:\█ " Makes the vertical bar on the left thicc
+hi SignColumn ctermbg=none
+hi CursorLine ctermfg=none ctermbg=236
+hi StatusLineNC ctermfg=237 
+hi VertSplit ctermfg=237
+let g:airline_powerline_fonts=1
+let g:airline#extensions#tabline#enabled=1
 
 " ======== Hotkeys
 let mapleader=","
@@ -61,39 +67,27 @@ cmap <C-a> <Home>
 " Clears current highlighting 
 nmap <silent><Leader>c :nohlsearch<CR>
 " Opens a terminal inside Vim
-nmap <silent><Leader>t :terminal<CR>
-" Runs an alias I have set for Taskell and a script to manage my Kanban files 
-nmap <silent><Leader>k :terminal ++shell ++close kb<CR>
-" Renders the current buffer in markdown using Glow, either in a new window or in the current shell
-nmap <silent><Leader>v :terminal ++shell ++close glow -p "%:p"<CR>
-nmap <silent><Leader>V :silent !glow -p "%:p"<CR><C-L>
-" Runs an alias that renders pages from Learn X in Y Minutes in markdown in a new window
-nmap <Leader>l :terminal ++shell ++close learn 
+if has('nvim')
+  nmap <silent><Leader>t :split <bar> :terminal<CR>
+  tno <C-w> <C-\><C-n><C-w>
+  " Add other keybinds for nvim
+else 
+  nmap <silent><Leader>t :terminal<CR>
+  " Figure out how to return to normal mode like we do in nvim
+  " Runs an alias I have set for Taskell and a script to manage my Kanban files 
+  nmap <silent><Leader>k :terminal ++shell ++close kb<CR>
+  " Renders the current buffer in markdown using Glow, either in a new window or in the current shell
+  nmap <silent><Leader>v :terminal ++shell ++close glow -p "%:p"<CR>
+  nmap <silent><Leader>V :silent !glow -p "%:p"<CR><C-L>
+  " Runs an alias that renders pages from Learn X in Y Minutes in markdown in a new window
+  nmap <Leader>l :terminal ++shell ++close learn 
+endif
 " Commentary
-map <C-_> :Commentary<CR>
-
-" ALE
-" let g:ale_linters = {
-"   \ 'javascript': ['eslint', 'prettier'],
-"   \ 'typescript': ['eslint', 'prettier'],
-"   \ 'go': ['gopls', 'golangcli-lint'],
-"   \ 'scala': ['metals'],
-"   \ 'python': ['pylint'],
-"   \} 
-" let g:ale_fixers = { 
-"   \ 'javascript': ['eslint', 'prettier'],
-"   \ 'typescript': ['eslint', 'prettier'],
-"   \ 'scala': ['scalafmt'],
-"   \}
-" let g:ale_fix_on_save=1
-" let g:ale_set_balloons=1
-" let g:ale_completion_enabled=1
-" let g:airline#extensions#ale#enabled=1
-" nmap <silent><Leader>gd :ALEGoToDefinition<CR>
-" nmap <silent><Leader>d :ALEDetail<CR>
-" nmap <silent><Leader>an :ALENext<CR>
-" nmap <silent><Leader>ab :ALEPrevious<CR>
-" nmap <silent><Leader>af :ALEFindReferences -quickfix<CR>:copen<CR>
+if has('nvim')
+  map <C-/> :Commentary<CR>
+else
+  map <C-_> :Commentary<CR>
+endif
 
 " FZF
 nmap <silent><Leader>f :Ag<CR>
@@ -161,10 +155,10 @@ nmap <silent> [g <Plug>(coc-diagnostic-prev)
 nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
 " GoTo code navigation
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
+nmap <silent><Leader>gd <Plug>(coc-definition)
+nmap <silent><Leader>gy <Plug>(coc-type-definition)
+nmap <silent><Leader>gi <Plug>(coc-implementation)
+nmap <silent><Leader>gr <Plug>(coc-references)
 
 " Use K to show documentation in preview window
 nnoremap <silent> K :call ShowDocumentation()<CR>
@@ -184,8 +178,8 @@ autocmd CursorHold * silent call CocActionAsync('highlight')
 nmap <leader>rn <Plug>(coc-rename)
 
 " Formatting selected code
-xmap <leader>f  <Plug>(coc-format-selected)
-nmap <leader>f  <Plug>(coc-format-selected)
+" xmap <leader>f  <Plug>(coc-format-selected)
+" nmap <leader>f  <Plug>(coc-format-selected)
 
 augroup mygroup
   autocmd!
@@ -213,7 +207,7 @@ xmap <silent> <leader>r  <Plug>(coc-codeaction-refactor-selected)
 nmap <silent> <leader>r  <Plug>(coc-codeaction-refactor-selected)
 
 " Run the Code Lens action on the current line
-nmap <leader>cl  <Plug>(coc-codelens-action)
+" nmap <leader>cl  <Plug>(coc-codelens-action)
 
 " Map function and class text objects
 " NOTE: Requires 'textDocument.documentSymbol' support from the language server
@@ -257,7 +251,7 @@ set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 
 " Mappings for CoCList
 " Show all diagnostics
-nnoremap <silent><nowait> <space>a  :<C-u>CocList diagnostics<cr>
+nnoremap <silent><nowait> <space>d  :<C-u>CocList diagnostics<cr>
 " Manage extensions
 nnoremap <silent><nowait> <space>e  :<C-u>CocList extensions<cr>
 " Show commands
@@ -278,3 +272,6 @@ nnoremap <nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<
 nnoremap <nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
 inoremap <nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
 inoremap <nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
+
+" Emmet
+let g:user_emmet_leader_key='<C-e>'
