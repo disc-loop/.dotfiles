@@ -105,6 +105,12 @@ let g:NERDTreeChDirMode=3
 let NERDTreeIgnore=['\.*\.sw.$', '\~$']
 nmap <silent><Leader><Tab> :NERDTreeToggle<CR> :NERDTreeRefreshRoot<CR>
 
+" vim-go
+" Use CoC gd instead
+let g:go_def_mapping_enabled = 0
+" CoC has the same mapping for reading docs so disabling
+let g:go_doc_keywordprg_enabled = 0
+
 " CoC Sample Config
 " May need for Vim (not Neovim) since coc.nvim calculates byte offset by count
 " utf-8 byte sequence
@@ -268,6 +274,8 @@ nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
 nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
 
 " Scrolling
+" TODO: Not working as intended: keybinds don't seem to work
+" Try this thread: https://github.com/neoclide/coc.nvim/issues/609
 nnoremap <nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
 nnoremap <nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
 inoremap <nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"

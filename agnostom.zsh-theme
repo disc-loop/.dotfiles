@@ -35,8 +35,8 @@
 CURRENT_BG='NONE'
 
 case ${SOLARIZED_THEME:-dark} in
-    light) CURRENT_FG='white';;
-    *)     CURRENT_FG='black';;
+    light) CURRENT_FG='black';;
+    *)     CURRENT_FG='white';;
 esac
 
 # Special Powerline characters
@@ -113,7 +113,7 @@ prompt_git() {
     if [[ -n $dirty ]]; then
       prompt_segment magenta black
     else
-      prompt_segment cyan $CURRENT_FG
+      prompt_segment cyan black #$CURRENT_FG
     fi
 
     if [[ -e "${repo_path}/BISECT_LOG" ]]; then
@@ -204,7 +204,7 @@ prompt_hg() {
 
 # Dir: current working directory
 prompt_dir() {
-  prompt_segment $CURRENT_FG grey '%~'
+  prompt_segment $CURRENT_FG black '%~'
 }
 
 # Virtualenv: current working virtualenv
