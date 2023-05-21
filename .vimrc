@@ -19,6 +19,9 @@ Plug 'vim-ruby/vim-ruby'
 Plug 'tpope/vim-rails'
 Plug 'tpope/vim-commentary'
 Plug 'mattn/emmet-vim'
+" Plug 'github/copilot.vim'
+" Plugin 'reedes/vim-wordy' " Helps improve writing by highlighting weak prose
+Plug 'ngmy/vim-rubocop'
 
 call plug#end()
 
@@ -274,7 +277,7 @@ nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
 nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
 
 " Scrolling
-" TODO: Not working as intended: keybinds don't seem to work
+" FIXME: Not working as intended: keybinds don't seem to work
 " Try this thread: https://github.com/neoclide/coc.nvim/issues/609
 nnoremap <nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
 nnoremap <nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
