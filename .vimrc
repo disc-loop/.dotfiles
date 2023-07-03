@@ -65,6 +65,7 @@ let g:airline#extensions#tabline#enabled=1
 
 " ======== Hotkeys
 let mapleader=","
+" Send things to system clipboard
 " Overrides command line behaviour to allow cursor to move to beginning of line
 cmap <C-a> <Home>
 " Clears current highlighting 
@@ -85,6 +86,13 @@ else
   " Runs an alias that renders pages from Learn X in Y Minutes in markdown in a new window
   nmap <Leader>l :terminal ++shell ++close learn 
 endif
+" Move blocks of text
+nnoremap <silent><C-j> :m .+1<CR>==
+nnoremap <silent><C-k> :m .-2<CR>==
+inoremap <silent><C-j> <Esc>:m .+1<CR>==gi
+inoremap <silent><C-k> <Esc>:m .-2<CR>==gi
+vnoremap <silent><C-j> :m '>+1<CR>gv=gv
+vnoremap <silent><C-k> :m '<-2<CR>gv=gv
 " Commentary
 if has('nvim')
   map <C-/> :Commentary<CR>
