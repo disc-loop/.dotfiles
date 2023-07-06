@@ -68,6 +68,8 @@ let mapleader=","
 " Send things to system clipboard
 nmap <Leader>y "+y
 nmap <Leader>Y "+Y
+vmap <Leader>y "+y
+vmap <Leader>Y "+Y
 " Overrides command line behaviour to allow cursor to move to beginning of line
 cmap <C-a> <Home>
 " Clears current highlighting 
