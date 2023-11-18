@@ -204,7 +204,18 @@ prompt_hg() {
 
 # Dir: current working directory
 prompt_dir() {
-  prompt_segment $CURRENT_FG black '%~'
+  if [[ $COLUMNS -lt 80 ]]; then
+    prompt_segment $CURRENT_FG black '%(3~|%-1~/…/%1~|%~)'
+  else
+    # The expression at the end is zsh prompt expansion:
+    # %() is a conditional substring. It is a ternary expression,
+    # so if the first part is true (4~ means at least 4 dirs deep)
+    # then (represented by |) return expr, otherwise (using | again)
+    # return expr. Here, we're returning the first 2 dirs (%-2) followed
+    # by elipses, then the last 2 dirs (%2~). Otherwise, it displays
+    # the full path.
+    prompt_segment $CURRENT_FG black '%(4~|%-2~/…/%2~|%~)'
+  fi
 }
 
 # Virtualenv: current working virtualenv
