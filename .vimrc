@@ -5,19 +5,13 @@ set rtp+=/usr/local/opt/fzf
 call plug#begin('~/.vim/plugged')
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-" Plug 'powerline/powerline-fonts'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'tpope/vim-commentary'
-" Plug 'lifepillar/vim-gruvbox8'
 Plug 'ellisonleao/gruvbox.nvim'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'neoclide/coc.nvim' ", {'branch': 'master', 'do': 'yarn install --frozen-lockfile'}
 Plug 'fatih/vim-go'
-" Plug 'pangloss/vim-javascript'
-" Plug 'leafgarland/typescript-vim'
-" Plug 'vim-ruby/vim-ruby'
-" Plug 'tpope/vim-rails'
 Plug 'mattn/emmet-vim'
 Plug 'francoiscabrol/ranger.vim'
 Plug 'github/copilot.vim'

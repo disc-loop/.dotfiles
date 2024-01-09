@@ -36,6 +36,3 @@ export FZF_DEFAULT_OPTS="--bind ctrl-b:preview-up,ctrl-f:preview-down --preview-
 eval "$(fzf --zsh)"
 source /usr/local/Cellar/fzf/0.55.0/shell/key-bindings.zsh
 source /usr/local/Cellar/fzf/0.55.0/shell/completion.zsh
-# source /usr/local/opt/chruby/share/chruby/chruby.sh
-# source /usr/local/opt/chruby/share/chruby/auto.sh
-# chruby ruby-3.3.0
