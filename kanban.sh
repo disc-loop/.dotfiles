@@ -4,21 +4,21 @@ set -euo pipefail
 # set -x
 
 workBoard() {
-  now=$(date +%y-%m-%d) 
+  now=$(date +%y-%m-%d)
   yest=$(date -v -1d +%y-%m-%d)
-  if [ -f "$HOME/Documents/Notes/Work/$now.md" ]
-    then taskell "$HOME/Documents/Notes/Work/$now.md"
+  if [ -f "$WORKNOTES/$now.md" ]
+    then taskell "$WORKNOTES/$now.md"
     else 
       printf '\nCreating board...\n\n'
-      if [ -f "$HOME/Documents/Notes/Work/$yest.md" ]
-        then cp  ~/Documents/Notes/Work/$yest.md ~/Documents/Notes/Work/$now.md && taskell ~/Documents/Notes/Work/$now.md
-        else cp ~/Documents/Notes/Templates/Kanban.md ~/Documents/Notes/Work/$now.md 
+      if [ -f "$WORKNOTES/$yest.md" ]
+        then cp "$WORKNOTES/$yest.md" "$WORKNOTES/$now.md" && taskell "$WORKNOTES/$now.md"
+        else cp "$SLIPBOX/Templates/taskell.md" "$WORKNOTES/$now.md"
       fi
   fi
 }
 
 personalBoard() {
-  taskell ~/Documents/Notes/Tasks/Daily.md
+  taskell $PERSONALNOTES
 }
 
 openBoard() {

@@ -5,10 +5,19 @@ alias vi='nvim'
 alias so="source ~/.zshrc"
 alias py="python3"
 alias learn='lrn() { learnDir=~/Programming/learnxinyminutes-docs/; git -C $learnDir pull && glow -p $learnDir"$1"*.markdown }; lrn'
-alias kb="~/kanban.sh"
-alias zshconfig="vim ~/.zshrc"
+alias kb="~/.dotfiles/kanban.sh"
+alias zshconfig="nvim ~/.zshrc"
 alias ohmyzsh="vim ~/.oh-my-zsh"
 alias rg="ranger"
 alias decode='dec() { echo "$1" | base64 -d | jq }; dec'
-alias jira='[ -f ~/Documents/Notes/Templates/Template\ for\ Jira.md ] && cat ~/Documents/Notes/Templates/Template\ for\ Jira.md | pbcopy; echo Copied JIRA template to clipboard'
+alias jira='cat ~/Documents/Slip\ Box/Projects/Work/Templates/JIRA\ Ticket\ Template.md | pbcopy; echo Copied JIRA template to clipboard'
 alias zshenv='vi ~/.zshenv'
+alias aws-login='aws-login-fn() { export AWS_PROFILE="$1"; app-aws-login.py $AWS_PROFILE }; aws-login-fn'
+alias aws-logout='AWS_PROFILE=""; rm ~/.aws/credentials'
+alias rfl='vi $SLIPBOX/Projects/Work/Reflections/$(date +"%Y-%m-%d").md'
+alias get-nonprod-im-vals='aws ssm get-parameters --names "/apps/npp/nonprod/ironman_username" "/apps/npp/nonprod/ironman_password" "/apps/payid/dev/ironman_url" --with-decryption | jq'
+
+# Global variables
+export SLIPBOX="$HOME/Documents/Slip Box"
+export WORKNOTES="$SLIPBOX/Projects/Work/Notes"
+export PERSONALNOTES="$SLIPBOX/Projects/Quotidian.md"

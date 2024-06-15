@@ -5,8 +5,10 @@ set rtp+=/usr/local/opt/fzf
 call plug#begin('~/.vim/plugged')
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'powerline/powerline-fonts'
+" Plug 'powerline/powerline-fonts'
 Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'tpope/vim-commentary'
 Plug 'lifepillar/vim-gruvbox8'
 Plug 'ellisonleao/gruvbox.nvim'
 Plug 'preservim/nerdtree'
@@ -15,11 +17,11 @@ Plug 'neoclide/coc.nvim', {'branch': 'master', 'do': 'yarn install --frozen-lock
 Plug 'fatih/vim-go'
 Plug 'pangloss/vim-javascript'
 Plug 'leafgarland/typescript-vim'
-Plug 'vim-ruby/vim-ruby'
-Plug 'tpope/vim-rails'
-Plug 'tpope/vim-commentary'
+" Plug 'vim-ruby/vim-ruby'
+" Plug 'tpope/vim-rails'
 Plug 'mattn/emmet-vim'
-" Plug 'github/copilot.vim'
+Plug 'francoiscabrol/ranger.vim'
+Plug 'github/copilot.vim'
 " Plugin 'reedes/vim-wordy' " Helps improve writing by highlighting weak prose
 Plug 'ngmy/vim-rubocop'
 
@@ -30,9 +32,9 @@ set showcmd " Shows the commands being used in the command line
 set number relativenumber cursorline " Sets relative line numbering and shows the line the cursor is on
 set hlsearch incsearch ignorecase wrapscan " Highlight pending searches and search results, ignores case and searches globally
 set hidden " Allows you to swap to different buffers without writing to files
-set nowrap " Do not wrap text in windows by default
+set wrap " Wrap text in windows by default
 set tabstop=2 shiftwidth=2 expandtab " Sets the amount of spaces <Tab> is worth and the number of spaces to use for (auto)indentation in insert mode
-set autoindent smartindent " Enables smart auto-indentation
+set autoindent smartindent breakindent linebreak " Enables smart auto-indentation
 filetype plugin indent on " Enables filetype detection, both for plugins and automatic indentation
 set backspace=indent,eol,start " Enables backspacing over auto-indenting, line breaks and the start of the line
 set whichwrap=h,l,b,s,<,> " Specifies particular keys that let the cursor move to the next/prev line at the first/last char
@@ -53,13 +55,18 @@ if has('nvim')
 else
   colorscheme gruvbox8
 endif
+let g:airline_theme='gruvbox8'
+let hour = strftime("%H")
+if 6 <= hour && hour < 18
+  set background=light
+endif
 let &t_EI = "\e[2 q" " Sets the cursor to thin bar in insert mode
 let &t_SI = "\e[6 q"
-set fillchars+=vert:\█ " Makes the vertical bar on the left thicc
-hi SignColumn ctermbg=none
-hi CursorLine ctermfg=none ctermbg=236
-hi StatusLineNC ctermfg=237 
-hi VertSplit ctermfg=237
+set fillchars+=vert:\| " For some reason, this doesn't get coloured correctly if you use █
+" hi SignColumn ctermbg=none
+" hi CursorLine ctermfg=none ctermbg=236
+" hi StatusLineNC ctermfg=237 
+" hi VertSplit ctermfg=237
 let g:airline_powerline_fonts=1
 let g:airline#extensions#tabline#enabled=1
 
@@ -76,19 +83,14 @@ cmap <C-a> <Home>
 nmap <silent><Leader>c :nohlsearch<CR>
 " Opens a terminal inside Vim
 if has('nvim')
-  nmap <silent><Leader>t :split <bar> :terminal<CR>
+  nmap <silent><Leader>t :split <bar> :terminal<CR>i
   tno <C-w> <C-\><C-n><C-w>
-  " Add other keybinds for nvim
-else 
-  nmap <silent><Leader>t :terminal<CR>
   " Figure out how to return to normal mode like we do in nvim
   " Runs an alias I have set for Taskell and a script to manage my Kanban files 
-  nmap <silent><Leader>k :terminal ++shell ++close kb<CR>
+  nmap <silent><Leader>k :terminal kb<CR>
   " Renders the current buffer in markdown using Glow, either in a new window or in the current shell
-  nmap <silent><Leader>v :terminal ++shell ++close glow -p "%:p"<CR>
-  nmap <silent><Leader>V :silent !glow -p "%:p"<CR><C-L>
-  " Runs an alias that renders pages from Learn X in Y Minutes in markdown in a new window
-  nmap <Leader>l :terminal ++shell ++close learn 
+  nmap <silent><Leader>V :terminal glow -p "%"<CR>i
+  nmap <silent><Leader>v :split <bar> :terminal glow -p "%"<CR>i
 endif
 " Move blocks of text
 nnoremap <silent><C-j> :m .+1<CR>==
@@ -97,11 +99,12 @@ inoremap <silent><C-j> <Esc>:m .+1<CR>==gi
 inoremap <silent><C-k> <Esc>:m .-2<CR>==gi
 vnoremap <silent><C-j> :m '>+1<CR>gv=gv
 vnoremap <silent><C-k> :m '<-2<CR>gv=gv
+
 " Commentary
 if has('nvim')
-  map <C-/> :Commentary<CR>
-else
   map <C-_> :Commentary<CR>
+else
+  map <C-/> :Commentary<CR>
 endif
 
 " FZF
@@ -113,12 +116,16 @@ nmap <silent><Leader>ag :Ag <C-R><C-W><CR>
 " FZF Ag doesn't support options, so I will need to overwrite the function.
 " let s:ag_options = ' --smart-case --hidden'
 
+" Ranger
+let g:ranger_map_keys = 0
+map <leader><Tab> :Ranger<CR>
+
 " NERDTree
-let g:NERDTreeWinSize=45
-let g:NERDTreeShowHidden=1
-let g:NERDTreeChDirMode=3
-let NERDTreeIgnore=['\.*\.sw.$', '\~$']
-nmap <silent><Leader><Tab> :NERDTreeToggle<CR> :NERDTreeRefreshRoot<CR>
+" let g:NERDTreeWinSize=45
+" let g:NERDTreeShowHidden=1
+" let g:NERDTreeChDirMode=3
+" let NERDTreeIgnore=['\.*\.sw.$', '\~$']
+" nmap <silent><Leader><Tab> :NERDTreeToggle<CR> :NERDTreeRefreshRoot<CR>
 
 " vim-go
 " Use CoC gd instead
@@ -154,7 +161,7 @@ inoremap <silent><expr> <TAB>
 inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
 
 " Make <CR> to accept selected completion item or notify coc.nvim to format
-" <C-g>u breaks current undo, please make your own choice
+" <C-g>u breaks current undo, please make your own choice.
 inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
                               \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
@@ -199,8 +206,8 @@ autocmd CursorHold * silent call CocActionAsync('highlight')
 nmap <leader>rn <Plug>(coc-rename)
 
 " Formatting selected code
-" xmap <leader>f  <Plug>(coc-format-selected)
-" nmap <leader>f  <Plug>(coc-format-selected)
+xmap <leader>4  <Plug>(coc-format-selected)
+nmap <leader>4  <Plug>(coc-format-selected)
 
 augroup mygroup
   autocmd!
@@ -297,4 +304,9 @@ inoremap <nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(
 inoremap <nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
 
 " Emmet
-let g:user_emmet_leader_key='<C-e>'
+" TODO: Find a better key as this breaks scrolling
+" let g:user_emmet_leader_key='<C-e>'
+
+" Copilot
+imap <silent><script><expr> <C-c> copilot#Accept("\<CR>")
+let g:copilot_no_tab_map = v:true
