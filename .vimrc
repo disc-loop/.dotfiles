@@ -9,21 +9,20 @@ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'tpope/vim-commentary'
-Plug 'lifepillar/vim-gruvbox8'
+" Plug 'lifepillar/vim-gruvbox8'
 Plug 'ellisonleao/gruvbox.nvim'
-Plug 'preservim/nerdtree'
 Plug 'editorconfig/editorconfig-vim'
-Plug 'neoclide/coc.nvim', {'branch': 'master', 'do': 'yarn install --frozen-lockfile'}
+Plug 'neoclide/coc.nvim' ", {'branch': 'master', 'do': 'yarn install --frozen-lockfile'}
 Plug 'fatih/vim-go'
-Plug 'pangloss/vim-javascript'
-Plug 'leafgarland/typescript-vim'
+" Plug 'pangloss/vim-javascript'
+" Plug 'leafgarland/typescript-vim'
 " Plug 'vim-ruby/vim-ruby'
 " Plug 'tpope/vim-rails'
 Plug 'mattn/emmet-vim'
 Plug 'francoiscabrol/ranger.vim'
 Plug 'github/copilot.vim'
 " Plugin 'reedes/vim-wordy' " Helps improve writing by highlighting weak prose
-Plug 'ngmy/vim-rubocop'
+" Plug 'ngmy/vim-rubocop'
 
 call plug#end()
 
@@ -40,6 +39,7 @@ set backspace=indent,eol,start " Enables backspacing over auto-indenting, line b
 set whichwrap=h,l,b,s,<,> " Specifies particular keys that let the cursor move to the next/prev line at the first/last char
 set splitbelow splitright " New splits are initialised from the bottom right
 set listchars=trail:~,tab:\|\ , " Set symbols for hidden characters
+set list " Show hidden characters
 if !has('nvim')
   set mouse=a ttymouse=xterm2 " Enables mouse use
 endif
@@ -55,10 +55,11 @@ if has('nvim')
 else
   colorscheme gruvbox8
 endif
-let g:airline_theme='gruvbox8'
+let g:airline_theme='base16_gruvbox_dark_hard'
 let hour = strftime("%H")
 if 6 <= hour && hour < 18
   set background=light
+  let g:airline_theme='base16_gruvbox_light_hard'
 endif
 let &t_EI = "\e[2 q" " Sets the cursor to thin bar in insert mode
 let &t_SI = "\e[6 q"
@@ -308,5 +309,15 @@ inoremap <nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(
 " let g:user_emmet_leader_key='<C-e>'
 
 " Copilot
+let g:copilot_enabled = 0
 imap <silent><script><expr> <C-c> copilot#Accept("\<CR>")
 let g:copilot_no_tab_map = v:true
+
+" Annotations / commenting
+highlight link MyComment Todo
+match MyComment /TOM/
+" Remember to find and clear the commentary at the end:
+" :vim /TOM:/ /**
+" Might need to check that it's not multiline comments before cfdo delete
+nmap <silent><Leader>n oTOM: <Esc>:Commentary<CR>A
+nmap <silent><Leader>N OTOM: <Esc>:Commentary<CR>A

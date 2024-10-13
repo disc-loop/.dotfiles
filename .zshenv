@@ -5,7 +5,7 @@ alias vi='nvim'
 alias so="source ~/.zshrc"
 alias py="python3"
 alias learn='lrn() { learnDir=~/Programming/learnxinyminutes-docs/; git -C $learnDir pull && glow -p $learnDir"$1"*.markdown }; lrn'
-alias kb="~/.dotfiles/kanban.sh"
+alias kb="nvim '$WORKNOTES/Kanban.md'"
 alias zshconfig="nvim ~/.zshrc"
 alias ohmyzsh="vim ~/.oh-my-zsh"
 alias rg="ranger"
@@ -16,6 +16,10 @@ alias aws-login='aws-login-fn() { export AWS_PROFILE="$1"; app-aws-login.py $AWS
 alias aws-logout='AWS_PROFILE=""; rm ~/.aws/credentials'
 alias rfl='vi $SLIPBOX/Projects/Work/Reflections/$(date +"%Y-%m-%d").md'
 alias get-nonprod-im-vals='aws ssm get-parameters --names "/apps/npp/nonprod/ironman_username" "/apps/npp/nonprod/ironman_password" "/apps/payid/dev/ironman_url" --with-decryption | jq'
+alias ff='findFile() { find . \( -path "*/node_modules" -o -path ".git" \) -prune -o -type f -iname $1 -print }; findFile'
+alias ffa='findFile() { find . -type f -iname $1 }; findFile'
+alias fd='findDir() { find . \( -path "*/node_modules" -o -path ".git" \) -prune -o -type d -iname $1 -print }; findDir'
+alias fda='findDir() { find . -type d -iname $1 }; findDir'
 
 # Global variables
 export SLIPBOX="$HOME/Documents/Slip Box"

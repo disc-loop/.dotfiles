@@ -34,8 +34,8 @@ export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -g ""'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS="--bind ctrl-b:preview-up,ctrl-f:preview-down --preview-window 'up,60%,border-bottom,+{2}+3/3,~3' --color=fg:-1,bg:-1,hl:-1 --color=fg+:-1,bg+:-1,hl+:-1"
 eval "$(fzf --zsh)"
-source /usr/local/Cellar/fzf/0.48.1/shell/key-bindings.zsh
-source /usr/local/Cellar/fzf/0.48.1/shell/completion.zsh
+source /usr/local/Cellar/fzf/0.55.0/shell/key-bindings.zsh
+source /usr/local/Cellar/fzf/0.55.0/shell/completion.zsh
 source /usr/local/opt/chruby/share/chruby/chruby.sh
 source /usr/local/opt/chruby/share/chruby/auto.sh
 chruby ruby-3.3.0
