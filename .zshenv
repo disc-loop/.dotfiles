@@ -20,7 +20,7 @@ alias get-nonprod-im-vals='aws ssm get-parameters --names "/apps/npp/nonprod/iro
 # Portable utilites
 alias ff='findFiles() { find . \( -path "*/node_modules" -o -path "*/.git" \) -prune -o -type f -iname $1 -print }; findFiles'
 alias ffa='findFiles() { find . -type f -iname $1 }; findFiles'
-alias fr='findRefs() { find . \( -path "*/node_modules" -o -path "*/.git" \) -prune -o -type f -iname \* -exec grep -H $1 {} \; }; findRefs'
+alias fr='findRefs() { dir=$2 ops=$3; find ${dir:-.} \( -path "*/node_modules" -o -path "*/.git" \) -prune -o -type f -iname \* -exec grep ${ops:--H} $1 {} \; }; findRefs'
 alias fra='findRefs() { grep -rH $1 }; findRefs'
 alias fd='findDir() { find . \( -path "*/node_modules" -o -path "*/.git" \) -prune -o -type d -iname $1 -print }; findDir'
 alias fda='findDir() { find . -type d -iname $1 }; findDir'
