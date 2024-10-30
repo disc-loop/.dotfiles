@@ -38,7 +38,7 @@ filetype plugin indent on " Enables filetype detection, both for plugins and aut
 set backspace=indent,eol,start " Enables backspacing over auto-indenting, line breaks and the start of the line
 set whichwrap=h,l,b,s,<,> " Specifies particular keys that let the cursor move to the next/prev line at the first/last char
 set splitbelow splitright " New splits are initialised from the bottom right
-set listchars=trail:~,tab:\|\ , " Set symbols for hidden characters
+set listchars=leadmultispace:\│\ ,trail:~,tab:\│\ , " Set symbols for hidden characters
 set list " Show hidden characters
 if !has('nvim')
   set mouse=a ttymouse=xterm2 " Enables mouse use
@@ -49,27 +49,32 @@ set re=0 " Use new regular expression engine so Vim doesn't lag with some filety
 set wildignore+=*/node_modules/*,*/.git/* " Ignore these patterns when file searching
 
 " ======== Appearance
-syntax enable
-if has('nvim')
-  colorscheme gruvbox
-else
-  colorscheme gruvbox8
+if !exists('g:syntax_on')
+  syntax on
 endif
-let g:airline_theme='base16_gruvbox_dark_hard'
-let hour = strftime("%H")
-if 6 <= hour && hour < 18
-  set background=light
-  let g:airline_theme='base16_gruvbox_light_hard'
+if !exists('g:colours_loaded')
+  let g:colours_loaded = 1
+  if has('nvim')
+    colorscheme gruvbox
+  else
+    colorscheme gruvbox8
+  endif
+  let g:airline_theme='base16_gruvbox_dark_hard'
+  let hour = strftime("%H")
+  if 6 <= hour && hour < 18
+    set background=light
+    let g:airline_theme='base16_gruvbox_light_hard'
+  endif
+  let &t_EI = "\e[2 q" " Sets the cursor to thin bar in insert mode
+  let &t_SI = "\e[6 q"
+  set fillchars+=vert:\| " For some reason, this doesn't get coloured correctly if you use █
+  " hi SignColumn ctermbg=none
+  " hi CursorLine ctermfg=none ctermbg=236
+  " hi StatusLineNC ctermfg=237 
+  " hi VertSplit ctermfg=237
+  let g:airline_powerline_fonts=1
+  let g:airline#extensions#tabline#enabled=1
 endif
-let &t_EI = "\e[2 q" " Sets the cursor to thin bar in insert mode
-let &t_SI = "\e[6 q"
-set fillchars+=vert:\| " For some reason, this doesn't get coloured correctly if you use █
-" hi SignColumn ctermbg=none
-" hi CursorLine ctermfg=none ctermbg=236
-" hi StatusLineNC ctermfg=237 
-" hi VertSplit ctermfg=237
-let g:airline_powerline_fonts=1
-let g:airline#extensions#tabline#enabled=1
 
 " ======== Hotkeys
 let mapleader=","
@@ -113,6 +118,7 @@ nmap <silent><Leader>f :Ag<CR>
 nmap <silent><Leader>o :Files<CR>
 nmap <silent><Leader>b :Buffers<CR>
 nmap <silent><Leader>ag :Ag <C-R><C-W><CR>
+" Use tab to select items in the window. This will open them in a buffer and also in the quickfix window
 " WIP: Search hidden files with smart casing
 " FZF Ag doesn't support options, so I will need to overwrite the function.
 " let s:ag_options = ' --smart-case --hidden'
@@ -276,7 +282,8 @@ command! -nargs=0 OR   :call     CocActionAsync('runCommand', 'editor.action.org
 " Add (Neo)Vim's native statusline support
 " NOTE: Please see `:h coc-status` for integrations with external plugins that
 " provide custom statusline: lightline.vim, vim-airline
-set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+" TOM: This stopped working for some reason
+" set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 
 " Mappings for CoCList
 " Show all diagnostics
@@ -315,7 +322,7 @@ let g:copilot_no_tab_map = v:true
 
 " Annotations / commenting
 highlight link MyComment Todo
-match MyComment /TOM/
+match MyComment /\<TOM\>\ze:/
 " Remember to find and clear the commentary at the end:
 " :vim /TOM:/ /**
 " Might need to check that it's not multiline comments before cfdo delete
