@@ -1,6 +1,7 @@
 # Aliases
 alias pdp1170="ssh pi@192.168.0.212"
 alias dotfiles="cd ~/.vim/VimConfig/"
+alias vimrc='vi $DOTFILES/.vimrc'
 alias vi='nvim'
 alias so="source ~/.zshrc"
 alias py="python3"

@@ -8,7 +8,7 @@ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'tpope/vim-commentary'
-Plug 'ellisonleao/gruvbox.nvim'
+Plug 'sainnhe/gruvbox-material'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'neoclide/coc.nvim' ", {'branch': 'master', 'do': 'yarn install --frozen-lockfile'}
 Plug 'fatih/vim-go'
@@ -19,38 +19,29 @@ Plug 'github/copilot.vim'
 call plug#end()
 
 " ======== General
-set showcmd " Shows the commands being used in the command line
-set number relativenumber cursorline " Sets relative line numbering and shows the line the cursor is on
-set hlsearch incsearch ignorecase wrapscan " Highlight pending searches and search results, ignores case and searches globally
-set hidden " Allows you to swap to different buffers without writing to files
+filetype plugin indent on " Enables filetype detection, both for plugins and automatic indentation
+set relativenumber cursorline " Sets relative line numbering and shows the line the cursor is on
+set hlsearch incsearch ignorecase " Highlight pending searches and search results, ignores case and searches globally
 set wrap " Wrap text in windows by default
 set tabstop=2 shiftwidth=2 expandtab " Sets the amount of spaces <Tab> is worth and the number of spaces to use for (auto)indentation in insert mode
 set autoindent smartindent breakindent linebreak " Enables smart auto-indentation
-filetype plugin indent on " Enables filetype detection, both for plugins and automatic indentation
 set backspace=indent,eol,start " Enables backspacing over auto-indenting, line breaks and the start of the line
-set whichwrap=h,l,b,s,<,> " Specifies particular keys that let the cursor move to the next/prev line at the first/last char
-set splitbelow splitright " New splits are initialised from the bottom right
 set listchars=leadmultispace:\│\ ,trail:~,tab:\│\ , " Set symbols for hidden characters
 set list " Show hidden characters
-if !has('nvim')
-  set mouse=a ttymouse=xterm2 " Enables mouse use
-endif
 set timeoutlen=1000 ttimeoutlen=0 " Sets wait time for hotkeys and <esc>
 set updatetime=750 " Sets the duration before the file is written to disk. I'm using this for faster CursorHold events
 set re=0 " Use new regular expression engine so Vim doesn't lag with some filetypes, e.g. .ts
 set wildignore+=*/node_modules/*,*/.git/* " Ignore these patterns when file searching
+if !has('nvim')
+  set mouse=a ttymouse=xterm2 " Enables mouse use
+endif
 
 " ======== Appearance
 if !exists('g:syntax_on')
   syntax on
 endif
 if !exists('g:colours_loaded')
-  let g:colours_loaded = 1
-  if has('nvim')
-    colorscheme gruvbox
-  else
-    colorscheme gruvbox8
-  endif
+  colorscheme gruvbox-material
   let g:airline_theme='base16_gruvbox_dark_hard'
   let hour = strftime("%H")
   if 6 <= hour && hour < 18

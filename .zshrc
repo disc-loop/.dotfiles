@@ -4,7 +4,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # Aliases: ~/.zshenv
 
 # Themes
-# export ZSH_THEME="agnostom"
+export ZSH_THEME="agnostom"
 
 # Plugins
 plugins=(git)
