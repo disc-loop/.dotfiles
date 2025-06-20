@@ -1,12 +1,15 @@
 export PATH=$PATH:~/bin
-export ZSH="$HOME/.oh-my-zsh"
-export ZSH_THEME="agnostom"
-export EDITOR='nvim'
 export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin/"
-export PATH="$PATH:/Users/Tom/Dev/apache-maven-3.9.9/bin/"
-plugins=(git)
-RANGER_LOAD_DEFAULT_RC=false
+export PATH="$PATH:$(npm get prefix -g)/bin/"
+export PATH="$PATH:$(go env GOPATH)/bin"
+export PATH="$HOME/.rbenv/bin:$PATH"
+export ZSH="$HOME/.oh-my-zsh"
 
+plugins=(git)
+export EDITOR='nvim'
+export ZSH_THEME="agnostom"
+
+RANGER_LOAD_DEFAULT_RC=false
 # Zai: Private Go Github modules
 export GONOSUMDB="github.com/applatform/*"
 

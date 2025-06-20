@@ -9,32 +9,13 @@ Plug 'sainnhe/gruvbox-material'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'francoiscabrol/ranger.vim'
-Plug 'fatih/vim-go'
 Plug 'github/copilot.vim'
-Plug 'nvim-lua/plenary.nvim'
 Plug 'CopilotC-Nvim/CopilotChat.nvim'
-Plug 'neovim/nvim-lspconfig'
+Plug 'nvim-lua/plenary.nvim'
 " Plug 'mattn/emmet-vim'
 call plug#end()
 
-lua << EOF
-require("CopilotChat").setup {
-  window = {
-    layout = "horizontal",
-    height = 0.3,
-  }
-}
-require('lspconfig').ruby_lsp.setup({
-  cmd = { "/Users/Tom/.rbenv/versions/3.2.2/bin/solargraph", "stdio" },
-  root_dir = require("lspconfig.util").root_pattern("Gemfile", ".git", "."),
-  settings = {
-    solargraph = {
-      diagnostics = true,
-      formatting = true,
-    },
-  },
-})
-EOF
+let mapleader=","
 
 " ======== General
 filetype plugin indent on " Enables filetype detection, both for plugins and automatic indentation
@@ -80,9 +61,6 @@ endif
 let &t_EI = "\e[2 q"
 let &t_SI = "\e[6 q"
 set fillchars+=vert:\| " For some reason, this doesn't get coloured correctly if you use █
-
-" ======== Hotkeys
-let mapleader=","
 
 " Copy to and paste from system clipboard
 nmap <Leader>y "+y
@@ -156,14 +134,14 @@ nmap <silent><Leader>gi <Plug>(coc-implementation)
 nmap <silent><Leader>gr <Plug>(coc-references)
 
 " Use K to show documentation in preview window
-nnoremap <silent> K :call ShowDocumentation()<CR>
-function! ShowDocumentation()
-  if CocAction('hasProvider', 'hover')
-    call CocActionAsync('doHover')
-  else
-    call feedkeys('K', 'in')
-  endif
-endfunction
+" nnoremap <silent> K :call ShowDocumentation()<CR>
+" function! ShowDocumentation()
+"   if CocAction('hasProvider', 'hover')
+"     call CocActionAsync('doHover')
+"   else
+"     call feedkeys('K', 'in')
+"   endif
+" endfunction
 
 " Highlight the symbol and its references when holding the cursor
 autocmd CursorHold * silent call CocActionAsync('highlight')
@@ -200,16 +178,16 @@ let g:user_emmet_leader_key='<C-e>'
 autocmd CursorHold * lua vim.diagnostic.open_float(nil, { focusable = false })
 
 " Use LSP for goto-definition and references
-" nnoremap <silent><leader>gd <cmd>lua vim.lsp.buf.definition()<CR>
-" nnoremap <silent>K  <cmd>lua vim.lsp.buf.hover()<CR>
-" nnoremap <silent><leader>gr <cmd>lua vim.lsp.buf.references()<CR>
-" nnoremap <silent><leader>gi <cmd>lua vim.lsp.buf.implementation()<CR>
-" nnoremap <silent><leader>rn <cmd>lua vim.lsp.buf.rename()<CR>
+nnoremap <silent><leader>gd <cmd>lua vim.lsp.buf.definition()<CR>
+nnoremap <silent>K  <cmd>lua vim.lsp.buf.hover()<CR>
+nnoremap <silent><leader>gr <cmd>lua vim.lsp.buf.references()<CR>
+nnoremap <silent><leader>gi <cmd>lua vim.lsp.buf.implementation()<CR>
+nnoremap <silent><leader>rn <cmd>lua vim.lsp.buf.rename()<CR>
 
 " Copilot
 let g:copilot_enabled = 0
-nmap <silent><Leader>ce :Copilot enable
-nmap <silent><Leader>cd :Copilot disable
+nmap <Leader>ce :Copilot enable<CR>
+nmap <Leader>cd :Copilot disable<CR>
 imap <silent><script><expr> <C-c> copilot#Accept("\<CR>")
 let g:copilot_no_tab_map = v:true
 nmap <silent><Leader>cc :CopilotChat<CR>
@@ -223,3 +201,140 @@ match MyComment /\<TOM\>\ze:/
 " Might need to check that it's not multiline comments before cfdo delete
 nmap <silent><Leader>n oTOM: <Esc>:Commentary<CR>A
 nmap <silent><Leader>N OTOM: <Esc>:Commentary<CR>A
+
+lua << EOF
+vim.diagnostic.config({
+  virtual_text = true, -- Show inline diagnostic messages
+  signs = true, -- Show signs in the gutter
+  underline = true, -- Underline problematic code
+  update_in_insert = false, -- Do not update diagnostics in insert mode
+  float = { border = "rounded" },
+})
+vim.keymap.set("n", "<leader>dt",
+  function()
+    if vim.diagnostic.is_enabled() then
+      vim.diagnostic.disable()
+    else
+    vim.diagnostic.enable()
+    end
+  end
+)
+vim.api.nvim_set_hl(0, "IncSearch", { bg = "#45707a", fg = "#f9f5d7" }) -- TODO: Fix this hack
+vim.keymap.set("n", "K",
+  function()
+    vim.lsp.buf.hover({ border = "rounded" })
+  end
+)
+require("CopilotChat").setup{ window = { layout = "horizontal", height = 0.3 } }
+vim.lsp.config('ts_ls', {
+  init_options = { hostInfo = 'neovim' },
+  cmd = { 'typescript-language-server', '--stdio' },
+  filetypes = { 'javascript', 'javascriptreact', 'javascript.jsx', 'typescript', 'typescriptreact', 'typescript.tsx' },
+  root_markers = { 'tsconfig.json', 'jsconfig.json', 'package.json', '.git' },
+  handlers = {
+    -- handle rename request for certain code actions like extracting functions / types
+    ['_typescript.rename'] = function(_, result, ctx)
+      local client = assert(vim.lsp.get_client_by_id(ctx.client_id))
+      vim.lsp.util.show_document({
+        uri = result.textDocument.uri,
+        range = {
+          start = result.position,
+          ['end'] = result.position,
+        },
+      }, client.offset_encoding)
+      vim.lsp.buf.rename()
+      return vim.NIL
+    end,
+  },
+  on_attach = function(client)
+    -- ts_ls provides `source.*` code actions that apply to the whole file. These only appear in
+    -- `vim.lsp.buf.code_action()` if specified in `context.only`.
+    vim.api.nvim_buf_create_user_command(0, 'LspTypescriptSourceAction', function()
+      local source_actions = vim.tbl_filter(function(action)
+        return vim.startswith(action, 'source.')
+      end, client.server_capabilities.codeActionProvider.codeActionKinds)
+      vim.lsp.buf.code_action({
+        context = {
+          only = source_actions,
+        },
+      })
+    end, {})
+  end,
+})
+vim.lsp.enable('ts_ls')
+vim.lsp.config('solargraph', {
+  cmd = { "/Users/Tom/.rbenv/versions/3.3.8/bin/solargraph", "stdio" },
+  root_markers = { "Gemfile", ".git" },
+  filetypes = { "ruby" },
+  settings = {
+    solargraph = {
+      autoformat = true,
+      completion = true,
+      diagnostic = true,
+      folding = true,
+      references = true,
+      rename = true,
+      symbols = true,
+    },
+  },
+})
+vim.lsp.enable('solargraph')
+vim.lsp.config('gopls', {
+  cmd = { 'gopls' },
+  filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
+  root_markers = { 'go.mod', 'go.sum' },
+  settings = {
+    gopls = {
+      analyses = {
+        unusedparams = true,
+      },
+      staticcheck = true,
+      gofumpt = true,
+    },
+  },
+})
+vim.lsp.enable('gopls')
+-- Use the following configuration to have your imports organized on save using the logic of goimports and your code formatted.
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = "*.go",
+  callback = function()
+    local params = vim.lsp.util.make_range_params()
+    params.context = {only = {"source.organizeImports"}}
+    -- buf_request_sync defaults to a 1000ms timeout. Depending on your
+    -- machine and codebase, you may want longer. Add an additional
+    -- argument after params if you find that you have to write the file
+    -- twice for changes to be saved.
+    -- E.g., vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 3000)
+    local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params)
+    for cid, res in pairs(result or {}) do
+      for _, r in pairs(res.result or {}) do
+        if r.edit then
+          local enc = (vim.lsp.get_client_by_id(cid) or {}).offset_encoding or "utf-16"
+          vim.lsp.util.apply_workspace_edit(r.edit, enc)
+        end
+      end
+    end
+    vim.lsp.buf.format({async = false})
+  end
+})
+vim.lsp.config('jsonls', {
+  cmd = { "/usr/local/Cellar/node/24.2.0/bin//vscode-json-language-server", "--stdio" }, -- TODO: Figure out why this can't be found
+  filetypes = { "json", "jsonc" },
+  init_options = { provideFormatter = true },
+  root_markers = { ".git" },
+})
+vim.lsp.enable('jsonls')
+vim.lsp.config['luals'] = {
+  cmd = { 'lua-language-server' },
+  filetypes = { 'lua' },
+  root_markers = { { '.luarc.json', '.luarc.jsonc' }, '.git' },
+  settings = {
+    Lua = {
+      runtime = {
+        version = 'LuaJIT',
+      }
+    }
+  }
+}
+vim.lsp.enable('luals')
+EOF
