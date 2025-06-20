@@ -1,23 +1,25 @@
-" ======== Plugin Installation
+" [ Plugins ]
 call plug#begin('~/.vim/plugged')
-Plug 'tpope/vim-commentary'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
-Plug '/usr/local/opt/fzf'
 Plug 'sainnhe/gruvbox-material'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+Plug '/usr/local/opt/fzf'
+Plug 'tpope/vim-commentary'
 Plug 'francoiscabrol/ranger.vim'
-Plug 'github/copilot.vim'
-Plug 'CopilotC-Nvim/CopilotChat.nvim'
+Plug 'hrsh7th/cmp-nvim-lsp'
+Plug 'hrsh7th/cmp-buffer'
+Plug 'hrsh7th/cmp-path'
+Plug 'hrsh7th/cmp-cmdline'
+Plug 'hrsh7th/nvim-cmp'
+Plug 'petertriho/cmp-git'
 Plug 'nvim-lua/plenary.nvim'
-" Plug 'mattn/emmet-vim'
+Plug 'CopilotC-Nvim/CopilotChat.nvim'
+Plug 'github/copilot.vim'
 call plug#end()
 
-let mapleader=","
-
-" ======== General
+" [ Commands ]
 filetype plugin indent on " Enables filetype detection, both for plugins and automatic indentation
 set number relativenumber cursorline " Sets relative line numbering and shows the line the cursor is on
 set hlsearch incsearch ignorecase " Highlight pending searches and search results, ignores case and searches globally
@@ -36,31 +38,41 @@ set encoding=utf-8
 set nobackup
 set nowritebackup
 set signcolumn=yes
-if !has('nvim')
-  set mouse=a ttymouse=xterm2 " Enables mouse use
-endif
 
-" ======== Appearance
-" if !exists('g:syntax_on')
-"   syntax on
-" endif
+" [ Appearance ]
 colorscheme gruvbox-material
-let g:gruvbox_material_background = 'hard' " soft, medium, hard
 
-" Match system appearance
+" Sync appearance with Mac system
 if has("macunix")
   if system('defaults read -g AppleInterfaceStyle 2>/dev/null') =~ "Dark"
-    let g:airline_theme='gruvbox'
     set background=dark
+    let g:airline_theme='base16_gruvbox_dark_hard'
   else
     set background=light
+    let g:airline_theme='base16_gruvbox_light_hard'
   endif
 endif
+" TODO: Handle Linux
 
 " Set cursor to a thin bar in insert mode
 let &t_EI = "\e[2 q"
 let &t_SI = "\e[6 q"
-set fillchars+=vert:\| " For some reason, this doesn't get coloured correctly if you use █
+
+" [ Keymaps & Plugin Config ]
+let mapleader=","
+
+" Personal notes that look like this: TOM:
+highlight link PersonalNote Todo
+match PersonalNote /\<TOM\>\ze:/
+nmap <silent><Leader>n oTOM: <Esc>:Commentary<CR>A
+nmap <silent><Leader>N OTOM: <Esc>:Commentary<CR>A
+
+" Make search item under cursor match Todo colours (must be cleared before overriding)
+highlight clear IncSearch
+highlight link IncSearch Todo
+
+" More traditional cursor navigation in command mode
+cmap <C-a> <Home>
 
 " Copy to and paste from system clipboard
 nmap <Leader>y "+y
@@ -70,162 +82,65 @@ vmap <Leader>Y "+Y
 nmap <Leader>p "+p
 nmap <Leader>P "+P
 
-" More traditional cursor navigation in command mode
-cmap <C-a> <Home>
-
 " Terminal
-if has('nvim')
-  nmap <silent><Leader>t :split <bar> :terminal<CR>i
-  tno <C-w> <C-\><C-n><C-w>
-endif
-
-" Move blocks
-nnoremap <silent><C-j> :m .+1<CR>==
-nnoremap <silent><C-k> :m .-2<CR>==
-inoremap <silent><C-j> <Esc>:m .+1<CR>==gi
-inoremap <silent><C-k> <Esc>:m .-2<CR>==gi
-vnoremap <silent><C-j> :m '>+1<CR>gv=gv
-vnoremap <silent><C-k> :m '<-2<CR>gv=gv
+nmap <silent><Leader>t :split <bar> :terminal<CR>i
+tno <C-w> <C-\><C-n><C-w>
 
 " Toggle comments
-map <C-_> :Commentary<CR>
+nmap <C-_> :Commentary<CR>
 
 " FZF
-command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, '--ignore node_modules --hidden', fzf#vim#with_preview(), <bang>0)
-" Hint: Use tab to select items in the window.
-" This will open them in a buffer and also in the quickfix window.
+" Hint: Use tab to select items
 nmap <silent><Leader>f :Ag<CR>
 nmap <silent><Leader>o :Files<CR>
 nmap <silent><Leader>b :Buffers<CR>
 nmap <silent><Leader>ag :Ag <C-R><C-W><CR>
+" Overrides Ag command so that specific directories are ignored
+command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, '--ignore node_modules --hidden', fzf#vim#with_preview(), <bang>0)
 
 " Ranger
 let g:ranger_map_keys = 0
 map <leader><Tab> :Ranger<CR>
 
-" Vim-go
-" Disable jumping to definition and symbol info as CoC will handle this
-let g:go_def_mapping_enabled = 0
-let g:go_doc_keywordprg_enabled = 0
-
-" Use tab for trigger completion with characters ahead and navigate
-" NOTE: There's always complete item selected by default, you may want to enable
-" no select by `"suggest.noselect": true` in your configuration file
-" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
-" other plugin before putting this into your config
-inoremap <silent><expr> <TAB>
-      \ coc#pum#visible() ? coc#pum#next(1) :
-      \ CheckBackspace() ? "\<Tab>" :
-      \ coc#refresh()
-inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
-
-" Make <CR> to accept selected completion item or notify coc.nvim to format
-inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
-
-function! CheckBackspace() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
-
-" GoTo code navigation
-nmap <silent><Leader>gd <Plug>(coc-definition)
-nmap <silent><Leader>gy <Plug>(coc-type-definition)
-nmap <silent><Leader>gi <Plug>(coc-implementation)
-nmap <silent><Leader>gr <Plug>(coc-references)
-
-" Use K to show documentation in preview window
-" nnoremap <silent> K :call ShowDocumentation()<CR>
-" function! ShowDocumentation()
-"   if CocAction('hasProvider', 'hover')
-"     call CocActionAsync('doHover')
-"   else
-"     call feedkeys('K', 'in')
-"   endif
-" endfunction
-
-" Highlight the symbol and its references when holding the cursor
-autocmd CursorHold * silent call CocActionAsync('highlight')
-
-" Rename symbol
-nmap <leader>rn <Plug>(coc-rename)
-
-" Quickfix
-nmap <leader>qf  <Plug>(coc-fix-current)
-
-" Refactor
-nmap <silent> <leader>re <Plug>(coc-codeaction-refactor)
-xmap <silent> <leader>r  <Plug>(coc-codeaction-refactor-selected)
-nmap <silent> <leader>r  <Plug>(coc-codeaction-refactor-selected)
-
-" Scroll pop-up windows
-if has('nvim-0.4.0') || has('patch-8.2.0750')
-  nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
-  inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
-  vnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
-  nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
-  inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
-  vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
-endif
-
-" Diagnostics
-nnoremap <silent><nowait> <space>d  :<C-u>CocList diagnostics<cr>
-
-" Emmet
-let g:user_emmet_leader_key='<C-e>'
-
-" Ruby
-" Show function signatures and info
-autocmd CursorHold * lua vim.diagnostic.open_float(nil, { focusable = false })
-
-" Use LSP for goto-definition and references
-nnoremap <silent><leader>gd <cmd>lua vim.lsp.buf.definition()<CR>
-nnoremap <silent>K  <cmd>lua vim.lsp.buf.hover()<CR>
-nnoremap <silent><leader>gr <cmd>lua vim.lsp.buf.references()<CR>
-nnoremap <silent><leader>gi <cmd>lua vim.lsp.buf.implementation()<CR>
-nnoremap <silent><leader>rn <cmd>lua vim.lsp.buf.rename()<CR>
-
-" Copilot
-let g:copilot_enabled = 0
-nmap <Leader>ce :Copilot enable<CR>
-nmap <Leader>cd :Copilot disable<CR>
-imap <silent><script><expr> <C-c> copilot#Accept("\<CR>")
-let g:copilot_no_tab_map = v:true
-nmap <silent><Leader>cc :CopilotChat<CR>
-vmap <silent><Leader>cc :CopilotChat<CR>
-
-" Personal notes
-" Hint: Find and clear the notes prior to committing code:
-" `:vim /TOM:/ /**`
-highlight link MyComment Todo
-match MyComment /\<TOM\>\ze:/
-" Might need to check that it's not multiline comments before cfdo delete
-nmap <silent><Leader>n oTOM: <Esc>:Commentary<CR>A
-nmap <silent><Leader>N OTOM: <Esc>:Commentary<CR>A
-
+" [ LSP, Completion, and AI ]
 lua << EOF
-vim.diagnostic.config({
-  virtual_text = true, -- Show inline diagnostic messages
-  signs = true, -- Show signs in the gutter
-  underline = true, -- Underline problematic code
-  update_in_insert = false, -- Do not update diagnostics in insert mode
-  float = { border = "rounded" },
+
+-- Golang
+vim.lsp.config('gopls', {
+  cmd = { 'gopls' },
+  filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
+  root_markers = { 'go.mod', 'go.sum' },
+  settings = {
+    gopls = {
+      analyses = {
+        unusedparams = true,
+      },
+      staticcheck = true,
+      gofumpt = true,
+    },
+  },
 })
-vim.keymap.set("n", "<leader>dt",
-  function()
-    if vim.diagnostic.is_enabled() then
-      vim.diagnostic.disable()
-    else
-    vim.diagnostic.enable()
+-- Import modules and format code on save (from the LSP docs)
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = "*.go",
+  callback = function()
+    local params = vim.lsp.util.make_range_params()
+    params.context = {only = {"source.organizeImports"}}
+    local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params)
+    for cid, res in pairs(result or {}) do
+      for _, r in pairs(res.result or {}) do
+        if r.edit then
+          local enc = (vim.lsp.get_client_by_id(cid) or {}).offset_encoding or "utf-16"
+          vim.lsp.util.apply_workspace_edit(r.edit, enc)
+        end
+      end
     end
+    vim.lsp.buf.format({async = false})
   end
-)
-vim.api.nvim_set_hl(0, "IncSearch", { bg = "#45707a", fg = "#f9f5d7" }) -- TODO: Fix this hack
-vim.keymap.set("n", "K",
-  function()
-    vim.lsp.buf.hover({ border = "rounded" })
-  end
-)
-require("CopilotChat").setup{ window = { layout = "horizontal", height = 0.3 } }
+})
+vim.lsp.enable('gopls')
+
+-- Typescript and Javascript
 vim.lsp.config('ts_ls', {
   init_options = { hostInfo = 'neovim' },
   cmd = { 'typescript-language-server', '--stdio' },
@@ -262,6 +177,17 @@ vim.lsp.config('ts_ls', {
   end,
 })
 vim.lsp.enable('ts_ls')
+
+-- JSON
+vim.lsp.config('jsonls', {
+  cmd = { "/usr/local/Cellar/node/24.2.0/bin//vscode-json-language-server", "--stdio" }, -- TODO: Figure out why this can't be found
+  filetypes = { "json", "jsonc" },
+  init_options = { provideFormatter = true },
+  root_markers = { ".git" },
+})
+vim.lsp.enable('jsonls')
+
+-- Ruby
 vim.lsp.config('solargraph', {
   cmd = { "/Users/Tom/.rbenv/versions/3.3.8/bin/solargraph", "stdio" },
   root_markers = { "Gemfile", ".git" },
@@ -279,51 +205,8 @@ vim.lsp.config('solargraph', {
   },
 })
 vim.lsp.enable('solargraph')
-vim.lsp.config('gopls', {
-  cmd = { 'gopls' },
-  filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
-  root_markers = { 'go.mod', 'go.sum' },
-  settings = {
-    gopls = {
-      analyses = {
-        unusedparams = true,
-      },
-      staticcheck = true,
-      gofumpt = true,
-    },
-  },
-})
-vim.lsp.enable('gopls')
--- Use the following configuration to have your imports organized on save using the logic of goimports and your code formatted.
-vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = "*.go",
-  callback = function()
-    local params = vim.lsp.util.make_range_params()
-    params.context = {only = {"source.organizeImports"}}
-    -- buf_request_sync defaults to a 1000ms timeout. Depending on your
-    -- machine and codebase, you may want longer. Add an additional
-    -- argument after params if you find that you have to write the file
-    -- twice for changes to be saved.
-    -- E.g., vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 3000)
-    local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params)
-    for cid, res in pairs(result or {}) do
-      for _, r in pairs(res.result or {}) do
-        if r.edit then
-          local enc = (vim.lsp.get_client_by_id(cid) or {}).offset_encoding or "utf-16"
-          vim.lsp.util.apply_workspace_edit(r.edit, enc)
-        end
-      end
-    end
-    vim.lsp.buf.format({async = false})
-  end
-})
-vim.lsp.config('jsonls', {
-  cmd = { "/usr/local/Cellar/node/24.2.0/bin//vscode-json-language-server", "--stdio" }, -- TODO: Figure out why this can't be found
-  filetypes = { "json", "jsonc" },
-  init_options = { provideFormatter = true },
-  root_markers = { ".git" },
-})
-vim.lsp.enable('jsonls')
+
+-- Lua
 vim.lsp.config['luals'] = {
   cmd = { 'lua-language-server' },
   filetypes = { 'lua' },
@@ -337,4 +220,106 @@ vim.lsp.config['luals'] = {
   }
 }
 vim.lsp.enable('luals')
+
+-- Diagnostics
+vim.diagnostic.config({
+  virtual_text = true, -- Show inline diagnostic messages
+  signs = true, -- Show signs in the gutter
+  underline = true, -- Underline problematic code
+  update_in_insert = false, -- Do not update diagnostics in insert mode
+  float = { border = "rounded" },
+})
+
+-- Shows diagnostics in floating window while hovering on line
+vim.api.nvim_create_autocmd("CursorHold", {
+  pattern = "*",
+  callback = function()
+    vim.diagnostic.open_float(nil, { focusable = false })
+  end
+})
+
+-- Toggles diagnostics
+vim.keymap.set("n", "<leader>dt",
+  function()
+    n = vim.api.nvim_get_current_buff()
+    if vim.diagnostic.is_enabled({ bufnr = n }) then
+      vim.diagnostic.disable(n)
+    else
+    vim.diagnostic.enable(n)
+    end
+  end
+)
+
+-- Show information for symbol
+vim.keymap.set("n", "K", function() vim.lsp.buf.hover({ border = "rounded" }) end, { silent = true })
+
+-- Go to definition, go to implementation, find references, and symbol rename
+vim.keymap.set("n", "<leader>gd", function() vim.lsp.buf.definition() end, { silent = true })
+vim.keymap.set("n", "<leader>gi", function() vim.lsp.buf.implementation() end, { silent = true })
+vim.keymap.set("n", "<leader>gr", function() vim.lsp.buf.references() end, { silent = true })
+vim.keymap.set("n", "<leader>rn", function() vim.lsp.buf.rename() end, { silent = true })
+
+-- Completion
+local cmp = require('cmp')
+cmp.setup({
+  sources = {
+    { name = 'nvim_lsp' }
+  },
+  window = {
+    completion = cmp.config.window.bordered(),
+    documentation = cmp.config.window.bordered(),
+  },
+  mapping = cmp.mapping.preset.insert({
+    ['<Tab>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
+    ['<S-Tab>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
+    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-f>'] = cmp.mapping.scroll_docs(4),
+    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-e>'] = cmp.mapping.abort(),
+    ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+  }),
+  sources = cmp.config.sources({
+    { name = 'nvim_lsp' },
+  }, {
+    { name = 'buffer' },
+  })
+})
+
+-- Git completions
+cmp.setup.filetype('gitcommit', {
+  sources = cmp.config.sources({
+    { name = 'git' },
+  }, {
+    { name = 'buffer' },
+  })
+})
+require("cmp_git").setup()
+
+-- Command completions
+cmp.setup.cmdline({ '/', '?' }, {
+  mapping = cmp.mapping.preset.cmdline(),
+  sources = {
+    { name = 'buffer' }
+  }
+})
+cmp.setup.cmdline(':', {
+  mapping = cmp.mapping.preset.cmdline(),
+  sources = cmp.config.sources({
+    { name = 'path' }
+  }, {
+    { name = 'cmdline' }
+  }),
+  matching = { disallow_symbol_nonprefix_matching = false }
+})
+
+-- Copilot
+require("CopilotChat").setup{ window = { layout = "horizontal", height = 0.3 } }
+vim.g.copilot_enabled = false
+vim.g.copilot_no_tab_map = true
+vim.keymap.set("n", "<leader>ce", ":Copilot enable<CR>")
+vim.keymap.set("n", "<leader>cd", ":Copilot disable<CR>")
+vim.keymap.set("i", "<C-c>", "copilot#Accept('<CR>')", { expr = true, silent = true, script = true })
+vim.keymap.set("n", "<leader>cc", "CopilotChat<CR>")
+vim.keymap.set("v", "<leader>cc", "CopilotChat<CR>")
+
 EOF
