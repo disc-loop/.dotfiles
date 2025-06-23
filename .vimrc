@@ -89,6 +89,7 @@ tno <C-w> <C-\><C-n><C-w>
 
 " Toggle comments
 nmap <C-_> :Commentary<CR>
+vmap <C-_> :Commentary<CR>
 
 " FZF
 " Hint: Use tab to select items
@@ -320,7 +321,7 @@ vim.g.copilot_no_tab_map = true
 vim.keymap.set("n", "<leader>ce", ":Copilot enable<CR>")
 vim.keymap.set("n", "<leader>cd", ":Copilot disable<CR>")
 vim.keymap.set("i", "<C-c>", "copilot#Accept('<CR>')", { expr = true, silent = true, script = true })
-vim.keymap.set("n", "<leader>cc", "CopilotChat<CR>")
-vim.keymap.set("v", "<leader>cc", "CopilotChat<CR>")
+vim.keymap.set("n", "<leader>cc", ":CopilotChat<CR>")
+vim.keymap.set("v", "<leader>cc", ":CopilotChat<CR>")
 
 EOF
