@@ -40,8 +40,8 @@ set nowritebackup
 set signcolumn=yes
 
 " [ Appearance ]
-colorscheme gruvbox-material
-
+let g:gruvbox_material_background = 'hard'
+let g:gruvbox_material_better_performance = 1
 " Sync appearance with Mac system
 if has("macunix")
   if system('defaults read -g AppleInterfaceStyle 2>/dev/null') =~ "Dark"
@@ -53,6 +53,7 @@ if has("macunix")
   endif
 endif
 " TODO: Handle Linux
+colorscheme gruvbox-material
 
 " Set cursor to a thin bar in insert mode
 let &t_EI = "\e[2 q"
