@@ -42,17 +42,21 @@ set signcolumn=yes
 " [ Appearance ]
 let g:gruvbox_material_background = 'hard'
 let g:gruvbox_material_better_performance = 1
-" Sync appearance with Mac system
-if has("macunix")
-  if system('defaults read -g AppleInterfaceStyle 2>/dev/null') =~ "Dark"
-    set background=dark
-    let g:airline_theme='base16_gruvbox_dark_hard'
-  else
-    set background=light
-    let g:airline_theme='base16_gruvbox_light_hard'
+" Sync appearance with system
+function! SyncAppearance()
+  " TODO: Handle Linux
+  if has("macunix")
+    let l:appearance = system('defaults read -g AppleInterfaceStyle 2>/dev/null')
+    if l:appearance =~ "Dark"
+      set background=dark
+      let g:airline_theme='base16_gruvbox_dark_hard'
+    else
+      set background=light
+      let g:airline_theme='base16_gruvbox_light_hard'
+    endif
   endif
-endif
-" TODO: Handle Linux
+endfunction
+call SyncAppearance()
 colorscheme gruvbox-material
 
 " Set cursor to a thin bar in insert mode
@@ -61,6 +65,12 @@ let &t_SI = "\e[6 q"
 
 " [ Keymaps & Plugin Config ]
 let mapleader=","
+
+" Source config changes
+map <Leader>so :source ~/.vimrc<CR>
+
+" Sync appearance changes with system
+map <Leader>sa :call SyncAppearance()<CR>
 
 " Personal notes that look like this: TOM:
 highlight link PersonalNote Todo
