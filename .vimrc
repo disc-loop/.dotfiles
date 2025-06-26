@@ -253,7 +253,7 @@ vim.api.nvim_create_autocmd("CursorHold", {
 -- Toggles diagnostics
 vim.keymap.set("n", "<leader>dt",
   function()
-    n = vim.api.nvim_get_current_buff()
+    n = vim.api.nvim_get_current_buf()
     if vim.diagnostic.is_enabled({ bufnr = n }) then
       vim.diagnostic.disable(n)
     else
