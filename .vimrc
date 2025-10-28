@@ -242,7 +242,7 @@ vim.lsp.enable('ts_ls')
 -- HTML
 vim.lsp.config('html', {
   cmd = { "vscode-html-language-server", "--stdio" },
-  filetypes = { "html", "templ" },
+  filetypes = { "html", "templ", "css" },
   init_options = {
     configurationSection = { "html", "css", "javascript" },
     embeddedLanguages = {
@@ -254,6 +254,19 @@ vim.lsp.config('html', {
   root_markers = { ".git" },
 })
 vim.lsp.enable('html')
+
+-- CSS
+vim.lsp.config('cssls', {
+  cmd = { "vscode-css-language-server", "--stdio" },
+  filetypes = { "css", "scss", "less" },
+  root_markers = { ".git" },
+  settings = {
+    css = { validate = true },
+    scss = { validate = true },
+    less = { validate = true },
+  },
+})
+vim.lsp.enable('cssls')
 
 -- ERB
 vim.lsp.config('herb_ls', {
