@@ -1,0 +1,15 @@
+# This is the configuration file for Ghostty.
+#
+# This template file has been automatically created at the following
+# path since Ghostty couldn't find any existing config files on your system:
+#
+#   /Users/Tom/Library/Application Support/com.mitchellh.ghostty/config
+
+font-family = Source Code Pro for Powerline
+theme = dark:Gruvbox Dark Hard,light:Gruvbox Light Hard
+adjust-cell-width = -10%
+font-size = 14
+
+macos-option-as-alt = true
+keybind = alt+left=unbind
+keybind = alt+right=unbind

@@ -12,7 +12,7 @@ alias rg="ranger"
 alias theme='$EDITOR $DOTFILES/agnostom.zsh-theme'
 alias decode='dec() { pbpaste | base64 -d | jq }; dec'
 alias pdp1170="ssh pi@192.168.0.212"
-alias vd="vd --theme=asciimono"
+alias settings='$EDITOR $DOTFILES/ghostty/config'
 
 # Portable utilites
 alias cd='changeDir() { export PREVIOUS_DIR=$(pwd); cd $1 }; changeDir'
@@ -37,6 +37,7 @@ export PERSONALNOTES="$SLIPBOX/Projects/Quotidian.md"
 export DOTFILES="$HOME/.dotfiles"
 
 # Zai specific
+alias chat='$EDITOR -c "CopilotChat" -c "only"'
 alias aws-login='aws-login-fn() { export AWS_PROFILE="$1"; app-aws-login.py $AWS_PROFILE }; aws-login-fn'
 alias aws-logout='AWS_PROFILE=""; rm ~/.aws/credentials'
 alias rfl='$EDITOR $SLIPBOX/Projects/Work/Reflections/$(date +"%Y-%m-%d").md'

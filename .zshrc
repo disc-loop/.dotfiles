@@ -21,5 +21,3 @@ export FZF_DEFAULT_OPTS="--bind ctrl-b:preview-up,ctrl-f:preview-down --preview-
 eval "$(fzf --zsh)"
 source /usr/local/Cellar/fzf/*/shell/key-bindings.zsh
 source /usr/local/Cellar/fzf/*/shell/completion.zsh
-
-eval "$(rbenv init -)"

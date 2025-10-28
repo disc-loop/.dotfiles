@@ -17,12 +17,13 @@ Plug 'petertriho/cmp-git'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'CopilotC-Nvim/CopilotChat.nvim'
 Plug 'github/copilot.vim'
+Plug 'ap/vim-css-color'
 call plug#end()
 
 " [ Commands ]
 filetype plugin indent on " Enables filetype detection, both for plugins and automatic indentation
 set number relativenumber cursorline " Sets relative line numbering and shows the line the cursor is on
-set hlsearch incsearch ignorecase " Highlight pending searches and search results, ignores case and searches globally
+set hlsearch noincsearch ignorecase " Highlight pending searches and search results, ignores case and searches globally
 set wrap " Wrap text in windows by default
 set tabstop=2 shiftwidth=2 expandtab " Sets the amount of spaces <Tab> is worth and the number of spaces to use for (auto)indentation in insert mode
 set splitright splitbelow
@@ -38,6 +39,7 @@ set encoding=utf-8
 set nobackup
 set nowritebackup
 set signcolumn=yes
+syntax on
 
 " [ Appearance ]
 let g:gruvbox_material_background = 'hard'
@@ -114,7 +116,7 @@ command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, '--ignore node_modules --hi
 let g:ranger_map_keys = 0
 map <leader><Tab> :Ranger<CR>
 
-" [ LSP, Completion, and AI ]
+" [ LSP, Completion, Neovim specific commands, and AI ]
 lua << EOF
 
 -- Golang
@@ -156,8 +158,28 @@ vim.lsp.enable('gopls')
 vim.lsp.config('ts_ls', {
   init_options = { hostInfo = 'neovim' },
   cmd = { 'typescript-language-server', '--stdio' },
-  filetypes = { 'javascript', 'javascriptreact', 'javascript.jsx', 'typescript', 'typescriptreact', 'typescript.tsx' },
-  root_markers = { 'tsconfig.json', 'jsconfig.json', 'package.json', '.git' },
+  filetypes = {
+    'javascript',
+    'javascriptreact',
+    'javascript.jsx',
+    'typescript',
+    'typescriptreact',
+    'typescript.tsx',
+  },
+  root_dir = function(bufnr, on_dir)
+    -- The project root is where the LSP can be started from
+    -- As stated in the documentation above, this LSP supports monorepos and simple projects.
+    -- We select then from the project root, which is identified by the presence of a package
+    -- manager lock file.
+    local root_markers = { 'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'bun.lockb', 'bun.lock' }
+    -- Give the root markers equal priority by wrapping them in a table
+    root_markers = vim.fn.has('nvim-0.11.3') == 1 and { root_markers, { '.git' } }
+      or vim.list_extend(root_markers, { '.git' })
+    -- We fallback to the current working directory if no project root is found
+    local project_root = vim.fs.root(bufnr, root_markers) or vim.fn.getcwd()
+
+    on_dir(project_root)
+  end,
   handlers = {
     -- handle rename request for certain code actions like extracting functions / types
     ['_typescript.rename'] = function(_, result, ctx)
@@ -173,13 +195,40 @@ vim.lsp.config('ts_ls', {
       return vim.NIL
     end,
   },
-  on_attach = function(client)
+  commands = {
+    ['editor.action.showReferences'] = function(command, ctx)
+      local client = assert(vim.lsp.get_client_by_id(ctx.client_id))
+      local file_uri, position, references = unpack(command.arguments)
+
+      local quickfix_items = vim.lsp.util.locations_to_items(references, client.offset_encoding)
+      vim.fn.setqflist({}, ' ', {
+        title = command.title,
+        items = quickfix_items,
+        context = {
+          command = command,
+          bufnr = ctx.bufnr,
+        },
+      })
+
+      vim.lsp.util.show_document({
+        uri = file_uri,
+        range = {
+          start = position,
+          ['end'] = position,
+        },
+      }, client.offset_encoding)
+
+      vim.cmd('botright copen')
+    end,
+  },
+  on_attach = function(client, bufnr)
     -- ts_ls provides `source.*` code actions that apply to the whole file. These only appear in
     -- `vim.lsp.buf.code_action()` if specified in `context.only`.
-    vim.api.nvim_buf_create_user_command(0, 'LspTypescriptSourceAction', function()
+    vim.api.nvim_buf_create_user_command(bufnr, 'LspTypescriptSourceAction', function()
       local source_actions = vim.tbl_filter(function(action)
         return vim.startswith(action, 'source.')
       end, client.server_capabilities.codeActionProvider.codeActionKinds)
+
       vim.lsp.buf.code_action({
         context = {
           only = source_actions,
@@ -190,16 +239,49 @@ vim.lsp.config('ts_ls', {
 })
 vim.lsp.enable('ts_ls')
 
+-- HTML
+vim.lsp.config('html', {
+  cmd = { "vscode-html-language-server", "--stdio" },
+  filetypes = { "html", "templ" },
+  init_options = {
+    configurationSection = { "html", "css", "javascript" },
+    embeddedLanguages = {
+      css = true,
+      javascript = true
+    },
+    provideFormatter = true
+  },
+  root_markers = { ".git" },
+})
+vim.lsp.enable('html')
+
+-- ERB
+vim.lsp.config('herb_ls', {
+  cmd = { "herb-language-server", "--stdio" },
+  filetypes = { "html", "ruby", "eruby" },
+  root_markers = { "Gemfile", ".git" },
+})
+vim.lsp.enable('herb_ls')
+
 -- JSON
 vim.lsp.config('jsonls', {
-  cmd = { "/usr/local/Cellar/node/24.2.0/bin//vscode-json-language-server", "--stdio" }, -- TODO: Figure out why this can't be found
+  cmd = { "vscode-json-language-server", "--stdio" },
   filetypes = { "json", "jsonc" },
   init_options = { provideFormatter = true },
   root_markers = { ".git" },
 })
-vim.lsp.enable('jsonls')
+--vim.lsp.enable('jsonls')
 
--- Ruby
+-- Ruby (newer versions)
+-- vim.lsp.config('ruby_lsp', {
+--   cmd = { "ruby-lsp" },
+--   filetypes = { "ruby", "eruby" },
+--   init_options = { formatter = "auto" },
+--   root_markers = { "Gemfile", ".git" },
+-- })
+-- vim.lsp.enable('ruby_lsp')
+
+-- Ruby (older versions)
 vim.lsp.config('solargraph', {
   cmd = { "/Users/Tom/.rbenv/versions/3.3.8/bin/solargraph", "stdio" },
   root_markers = { "Gemfile", ".git" },
@@ -233,34 +315,80 @@ vim.lsp.config['luals'] = {
 }
 vim.lsp.enable('luals')
 
+-- Python
+vim.lsp.config['pyright'] = {
+  cmd = { 'pyright-langserver', '--stdio' },
+  filetypes = { 'python' },
+  root_markers = { 'pyproject.toml', 'setup.py', 'setup.cfg', 'requirements.txt', 'Pipfile', 'pyrightconfig.json', '.git' },
+  settings = {
+    python = {
+      analysis = {
+        autoSearchPaths = true,
+        diagnosticMode = 'openFilesOnly',
+        useLibraryCodeForTypes = true,
+        reportAttributeAccessIssue = 'none',
+      }
+    }
+  }
+}
+vim.lsp.enable('pyright')
+
+-- Bash
+vim.lsp.config['bashls'] = {
+  cmd = { 'bash-language-server', 'start' },
+  filetypes = { 'bash', 'sh', 'zshenv', 'zshrc' },
+  root_markers = { '.git' },
+  settings = {
+    bashIde = {
+      globPattern = '*@(.sh|.inc|.bash|.command)'
+    }
+  }
+}
+vim.lsp.enable('bashls')
+
+-- YAML
+vim.lsp.config['yamlls'] = {
+  cmd = { 'yaml-language-server', '--stdio' },
+  filetypes = { 'yaml', 'yaml.docker-compose', 'yaml.gitlab', 'yaml.helm-values' },
+  root_markers = { '.git' },
+  settings = {
+    redhat = {
+      telemetry = {
+        enabled = false
+      }
+    }
+  }
+}
+vim.lsp.enable('yamlls')
+
 -- Diagnostics
 vim.diagnostic.config({
   virtual_text = true, -- Show inline diagnostic messages
   signs = true, -- Show signs in the gutter
   underline = true, -- Underline problematic code
   update_in_insert = false, -- Do not update diagnostics in insert mode
-  float = { border = "rounded" },
+  float = { border = 'rounded' },
 })
 
 -- Shows diagnostics in floating window while hovering on line
-vim.api.nvim_create_autocmd("CursorHold", {
-  pattern = "*",
+vim.api.nvim_create_autocmd('CursorHold', {
+  pattern = '*',
   callback = function()
     vim.diagnostic.open_float(nil, { focusable = false })
   end
 })
 
--- Toggles diagnostics
-vim.keymap.set("n", "<leader>dt",
-  function()
-    n = vim.api.nvim_get_current_buf()
-    if vim.diagnostic.is_enabled({ bufnr = n }) then
-      vim.diagnostic.disable(n)
-    else
-    vim.diagnostic.enable(n)
-    end
-  end
-)
+-- FIXME: Toggles diagnostics
+-- vim.keymap.set("n", "<leader>dt",
+--   function()
+--     n = vim.api.nvim_get_current_buf()
+--     if vim.diagnostic.is_enabled({ bufnr = n }) then
+--       vim.diagnostic.disable(n)
+--     else
+--     vim.diagnostic.enable(n)
+--     end
+--   end
+-- )
 
 -- Show information for symbol
 vim.keymap.set("n", "K", function() vim.lsp.buf.hover({ border = "rounded" }) end, { silent = true })
@@ -275,7 +403,9 @@ vim.keymap.set("n", "<leader>rn", function() vim.lsp.buf.rename() end, { silent 
 local cmp = require('cmp')
 cmp.setup({
   sources = {
-    { name = 'nvim_lsp' }
+    { name = 'nvim_lsp' },
+    { name = 'path' },
+    { name = 'buffer' },
   },
   window = {
     completion = cmp.config.window.bordered(),
@@ -290,11 +420,6 @@ cmp.setup({
     ['<C-e>'] = cmp.mapping.abort(),
     ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
   }),
-  sources = cmp.config.sources({
-    { name = 'nvim_lsp' },
-  }, {
-    { name = 'buffer' },
-  })
 })
 
 -- Git completions
@@ -323,6 +448,9 @@ cmp.setup.cmdline(':', {
   }),
   matching = { disallow_symbol_nonprefix_matching = false }
 })
+
+-- Neovim specific
+vim.g.markdown_recommended_style = 0
 
 -- Copilot
 require("CopilotChat").setup{ window = { layout = "horizontal", height = 0.3 } }
